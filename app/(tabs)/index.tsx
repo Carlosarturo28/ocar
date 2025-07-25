@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   FlatList,
@@ -7,8 +7,9 @@ import {
   Pressable,
   Text,
   StatusBar,
+  ActivityIndicator, // ✅ Importado para el indicador de carga
 } from 'react-native';
-import { Card } from '@/components/Card'; // ✅ Card original sin cambios
+import { Card } from '@/components/Card';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnimatedSelectedCard } from '@/components/card/AnimatedSelectedCard';
 
@@ -21,292 +22,83 @@ interface CardData {
   isHolo?: boolean;
 }
 
-const misCartas: CardData[] = [
-  {
-    id: 'swsh179',
-    name: 'Flareon',
-    imageUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1imagen.png',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh179',
-    name: 'Flareon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh181',
-    name: 'vaporeon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
-  },
-  {
-    id: 'swsh183',
-    name: 'Jolteon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh8-245',
-    name: 'celebi',
-    imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
-  },
-  {
-    id: 'swsh11-186',
-    name: 'Giratina',
-    imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh9-14568',
-    name: 'charizard',
-    imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh174679',
-    name: 'Flareon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
-  },
-  {
-    id: 'swsh1864561',
-    name: 'vaporeon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh134683',
-    name: 'Jolteon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
-  },
-  {
-    id: 'swsh8-234245',
-    name: 'celebi',
-    imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh11-1833336',
-    name: 'Giratina',
-    imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh9-1822222222',
-    name: 'charizard',
-    imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
-    isHolo: true,
-  },
-  {
-    id: 'swsh17ghfgh4679',
-    name: 'Flareon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
-  },
-  {
-    id: 'swsh18sdf64561',
-    name: 'vaporeon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
-  },
-  {
-    id: 'swsh134asdasdf683',
-    name: 'Jolteon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
-  },
-  {
-    id: 'swsh8-234asdsad245',
-    name: 'celebi',
-    imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
-  },
-  {
-    id: 'swsh11-183sdfsdf3336',
-    name: 'Giratina',
-    imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
-  },
-  {
-    id: 'swsh9-18sdfsdf22222222',
-    name: 'charizard',
-    imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
-  },
-  {
-    id: 'swsh17asds4679',
-    name: 'Flareon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
-  },
-  {
-    id: 'swsh18sdfs64561',
-    name: 'vaporeon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
-  },
-  {
-    id: 'swsh134sdfsdfsdf683',
-    name: 'Jolteon',
-    imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
-  },
-  {
-    id: 'swsh8-234sdfsdf245',
-    name: 'celebi',
-    imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
-  },
-  {
-    id: 'swsh11-183sdfsdf3336',
-    name: 'Giratina',
-    imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
-  },
-  {
-    id: 'swsh9-1822222dsg2',
-    name: 'charizard',
-    imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
-    maskUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
-    foilUrl:
-      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
-  },
-];
+// ✅ URL de ejemplo con tus datos. ¡Reemplázala por tu URL real!
+const CARDS_API_URL =
+  'https://gist.githubusercontent.com/Carlosarturo28/f3014a605f6d65b067980993f3c3732c/raw/8141445749f71c4c935492d50694e9f906f2e854/cards.json';
 
 export default function CardListScreen() {
+  // ✅ Estados para manejar los datos, la carga y los errores
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cardPositions, setCardPositions] = useState<{
     [key: string]: { x: number; y: number };
   }>({});
 
-  const selectedItem = misCartas.find((c) => c.id === selectedId);
+  // ✅ Hook para realizar la petición de red al montar el componente
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const response = await fetch(CARDS_API_URL);
+        if (!response.ok) {
+          throw new Error('No se pudo obtener la información de las cartas.');
+        }
+        const data: CardData[] = await response.json();
+        setCards(data);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // ✅ Función para capturar la posición de cada carta en el grid
+    fetchCards();
+  }, []); // El array vacío asegura que se ejecute solo una vez
+
+  // ✅ Ahora buscamos en el estado 'cards' en lugar de 'misCartas'
+  const selectedItem = cards.find((c) => c.id === selectedId);
+
   const handleCardLayout = (cardId: string, event: any) => {
     const { x, y, width, height } = event.nativeEvent.layout;
-
-    // Medimos la posición relativa a la pantalla completa
     event.target.measureInWindow((windowX: number, windowY: number) => {
       setCardPositions((prev) => ({
         ...prev,
-        [cardId]: {
-          x: windowX + width / 2, // Centro X de la carta
-          y: windowY + height / 2, // Centro Y de la carta
-        },
+        [cardId]: { x: windowX + width / 2, y: windowY + height / 2 },
       }));
     });
   };
+
+  // ✅ Renderizado condicional para el estado de carga
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size='large' color='#fff' />
+        <Text style={styles.loadingText}>Cargando cartas...</Text>
+      </View>
+    );
+  }
+
+  // ✅ Renderizado condicional para el estado de error
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar barStyle={'light-content'} />
       <FlatList
-        style={{
-          paddingHorizontal: 10,
-        }}
-        data={misCartas}
+        style={{ paddingHorizontal: 10 }}
+        // ✅ Usamos el estado 'cards' como fuente de datos
+        data={cards}
         ListFooterComponent={
-          <View
-            style={{
-              paddingBottom: 150,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                marginTop: 60,
-                paddingVertical: 10,
-                fontSize: 14,
-                color: '#646464ff',
-                fontFamily: 'Cinzel_700Bold',
-                textAlign: 'center',
-              }}
-            >
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
               © 2025 Of Creatures and Realms™. All rights reserved. Unauthorized
               reproduction or distribution is prohibited.
             </Text>
@@ -332,7 +124,6 @@ export default function CardListScreen() {
                 foil: item.foilUrl,
               }}
               onPress={() => setSelectedId(item.id)}
-              // ✅ Sin props adicionales - Card original
             />
           </View>
         )}
@@ -340,7 +131,6 @@ export default function CardListScreen() {
         numColumns={3}
       />
 
-      {/* ✅ Modal con la carta animada */}
       {selectedItem && (
         <AnimatedSelectedCard
           images={{
@@ -350,7 +140,7 @@ export default function CardListScreen() {
           }}
           isHolo={selectedItem.isHolo}
           onClose={() => setSelectedId(null)}
-          fromPosition={cardPositions[selectedItem.id]} // ✅ Posición de origen
+          fromPosition={cardPositions[selectedItem.id]}
         />
       )}
     </GestureHandlerRootView>
@@ -359,7 +149,36 @@ export default function CardListScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
+  // ✅ Estilos para centrar los indicadores
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#fff',
+    fontSize: 16,
+  },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 16,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
   logoContainer: { alignItems: 'center', marginTop: 40, marginBottom: 20 },
   logo: { width: 150, height: 150, resizeMode: 'contain' },
   cardWrapper: { flex: 1, alignItems: 'center', marginVertical: 10 },
+  footer: {
+    paddingBottom: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    marginTop: 60,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#646464ff',
+    fontFamily: 'Cinzel_700Bold',
+    textAlign: 'center',
+  },
 });
