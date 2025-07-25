@@ -24,7 +24,7 @@ interface CardData {
 
 // ✅ URL de ejemplo con tus datos. ¡Reemplázala por tu URL real!
 const CARDS_API_URL =
-  'https://gist.githubusercontent.com/Carlosarturo28/f3014a605f6d65b067980993f3c3732c/raw/8141445749f71c4c935492d50694e9f906f2e854/cards.json';
+  'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json';
 
 export default function CardListScreen() {
   // ✅ Estados para manejar los datos, la carga y los errores
