@@ -25,6 +25,15 @@ const misCartas: CardData[] = [
   {
     id: 'swsh179',
     name: 'Flareon',
+    imageUrl:
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1imagen.png',
+    foilUrl:
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1.png',
+    isHolo: true,
+  },
+  {
+    id: 'swsh179',
+    name: 'Flareon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
