@@ -6,6 +6,7 @@ import {
   Image,
   Pressable,
   Text,
+  StatusBar,
 } from 'react-native';
 import { Card } from '@/components/Card'; // ✅ Card original sin cambios
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -17,6 +18,7 @@ interface CardData {
   imageUrl: string;
   maskUrl: string;
   foilUrl: string;
+  isHolo?: boolean;
 }
 
 const misCartas: CardData[] = [
@@ -27,16 +29,17 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/179_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
+    isHolo: true,
   },
   {
     id: 'swsh181',
-    name: 'Vaporeon',
+    name: 'vaporeon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/181_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
   },
   {
     id: 'swsh183',
@@ -45,16 +48,17 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/183_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
+    isHolo: true,
   },
   {
     id: 'swsh8-245',
-    name: 'Celebi',
+    name: 'celebi',
     imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/foils/upscaled/245_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
   },
   {
     id: 'swsh11-186',
@@ -63,16 +67,18 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/foils/upscaled/186_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
+    isHolo: true,
   },
   {
     id: 'swsh9-14568',
-    name: 'Charizard',
+    name: 'charizard',
     imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/018_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
+    isHolo: true,
   },
   {
     id: 'swsh174679',
@@ -81,16 +87,17 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/179_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
   },
   {
     id: 'swsh1864561',
-    name: 'Vaporeon',
+    name: 'vaporeon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/181_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
+    isHolo: true,
   },
   {
     id: 'swsh134683',
@@ -99,16 +106,17 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/183_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
   },
   {
     id: 'swsh8-234245',
-    name: 'Celebi',
+    name: 'celebi',
     imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/foils/upscaled/245_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
+    isHolo: true,
   },
   {
     id: 'swsh11-1833336',
@@ -117,124 +125,126 @@ const misCartas: CardData[] = [
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/foils/upscaled/186_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
+    isHolo: true,
   },
   {
     id: 'swsh9-1822222222',
-    name: 'Charizard',
+    name: 'charizard',
     imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/018_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
+    isHolo: true,
   },
   {
-    id: '23425',
+    id: 'swsh17ghfgh4679',
     name: 'Flareon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/179_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
   },
   {
-    id: 'swsh18123443',
-    name: 'Vaporeon',
+    id: 'swsh18sdf64561',
+    name: 'vaporeon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/181_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
   },
   {
-    id: 'swsh183234',
+    id: 'swsh134asdasdf683',
     name: 'Jolteon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/183_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
   },
   {
-    id: 'swsh8-24543',
-    name: 'Celebi',
+    id: 'swsh8-234asdsad245',
+    name: 'celebi',
     imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/foils/upscaled/245_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
   },
   {
-    id: 'swsh11-18644',
+    id: 'swsh11-183sdfsdf3336',
     name: 'Giratina',
     imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/foils/upscaled/186_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
   },
   {
-    id: 'swsh9-1823',
-    name: 'Charizard',
+    id: 'swsh9-18sdfsdf22222222',
+    name: 'charizard',
     imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/018_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
   },
   {
-    id: 'swsh179323',
+    id: 'swsh17asds4679',
     name: 'Flareon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH179_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/179_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/179_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Flareon.png',
   },
   {
-    id: 'swsh18132',
-    name: 'Vaporeon',
+    id: 'swsh18sdfs64561',
+    name: 'vaporeon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH181_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/181_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/181_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/vaporeon.png',
   },
   {
-    id: 'swsh18322',
+    id: 'swsh134sdfsdfsdf683',
     name: 'Jolteon',
     imageUrl: 'https://images.pokemontcg.io/swshp/SWSH183_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swshp/masks/upscaled/183_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swshp/foils/upscaled/183_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Jolteon.png',
   },
   {
-    id: 'swsh8-24512',
-    name: 'Celebi',
+    id: 'swsh8-234sdfsdf245',
+    name: 'celebi',
     imageUrl: 'https://images.pokemontcg.io/swsh8/245_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh8/masks/upscaled/245_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh8/foils/upscaled/245_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/celebi.png',
   },
   {
-    id: 'swsh11-18632',
+    id: 'swsh11-183sdfsdf3336',
     name: 'Giratina',
     imageUrl: 'https://images.pokemontcg.io/swsh11/186_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh11/masks/upscaled/186_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh11/foils/upscaled/186_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/Giratina.png',
   },
   {
-    id: 'swsh9-1823',
-    name: 'Charizard',
+    id: 'swsh9-1822222dsg2',
+    name: 'charizard',
     imageUrl: 'https://images.pokemontcg.io/swsh9/18_hires.png',
     maskUrl:
       'https://poke-holo.b-cdn.net/foils/swsh9/masks/upscaled/018_foil_etched_sunpillar_2x.webp',
     foilUrl:
-      'https://poke-holo.b-cdn.net/foils/swsh9/foils/upscaled/018_foil_etched_sunpillar_2x.webp',
+      'https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/charizard.png',
   },
 ];
 
@@ -264,6 +274,7 @@ export default function CardListScreen() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
+      <StatusBar barStyle={'light-content'} />
       <FlatList
         style={{
           paddingHorizontal: 10,
@@ -328,6 +339,7 @@ export default function CardListScreen() {
             mask: selectedItem.maskUrl,
             foil: selectedItem.foilUrl,
           }}
+          isHolo={selectedItem.isHolo}
           onClose={() => setSelectedId(null)}
           fromPosition={cardPositions[selectedItem.id]} // ✅ Posición de origen
         />

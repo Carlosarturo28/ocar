@@ -22,9 +22,15 @@ interface Props {
   images: CardAssets;
   onClose: () => void;
   fromPosition?: { x: number; y: number }; // ✅ Posición de origen para la animación
+  isHolo?: boolean;
 }
 
-export function AnimatedSelectedCard({ images, onClose, fromPosition }: Props) {
+export function AnimatedSelectedCard({
+  images,
+  onClose,
+  fromPosition,
+  isHolo = false,
+}: Props) {
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();
   const mountProgress = useSharedValue(0);
 
@@ -193,6 +199,7 @@ export function AnimatedSelectedCard({ images, onClose, fromPosition }: Props) {
             radius={17}
           >
             <ImageCanvas
+              isHolo={isHolo}
               images={images}
               width={animatedWidth}
               height={animatedHeight}

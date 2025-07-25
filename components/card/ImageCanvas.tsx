@@ -30,6 +30,7 @@ interface ImageCanvasProps {
   touchPosition: SharedValue<{ x: number; y: number }>;
   images: CardAssets;
   isSelected: boolean;
+  isHolo?: boolean;
 }
 
 export function ImageCanvas({
@@ -40,6 +41,7 @@ export function ImageCanvas({
   radius,
   images,
   isSelected,
+  isHolo = false,
 }: ImageCanvasProps) {
   const { base, mask, foil } = images;
   const baseImage = useImage(base);
@@ -105,7 +107,7 @@ export function ImageCanvas({
         mask={
           <RoundedRect x={0} y={0} r={radius} width={width} height={height}>
             <RadialGradient
-              c={touchPosition} // ¡Usa la posición del toque directo!
+              c={touchPosition}
               r={maxDimensionMask}
               colors={['white', 'black']}
               positions={[0.0, 1.0]}
@@ -138,11 +140,11 @@ export function ImageCanvas({
           />
         )}
 
-        {isSelected && glareShinyLayer()}
-
         {isSelected && foilImage && isFoilVisible.value && maskedFoilLayer()}
 
-        {isSelected && (
+        {isSelected && glareShinyLayer()}
+
+        {isSelected && isHolo && (
           <HolographicLayer
             adjustedCenter={derivedAdjustedCenter}
             height={height}
