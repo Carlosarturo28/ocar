@@ -1,16 +1,17 @@
+// CardListScreen.tsx (versión actualizada)
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
   FlatList,
   StyleSheet,
-  Image,
   Pressable,
   Text,
   StatusBar,
-  ActivityIndicator, // ✅ Importado para el indicador de carga
+  ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Card } from '@/components/Card';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnimatedSelectedCard } from '@/components/card/AnimatedSelectedCard';
 
 interface CardData {
@@ -22,47 +23,41 @@ interface CardData {
   isHolo?: boolean;
 }
 
-// ✅ URL de ejemplo con tus datos. ¡Reemplázala por tu URL real!
 const CARDS_API_URL =
   'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json';
 
 export default function CardListScreen() {
-  // ✅ Estados para manejar los datos, la carga y los errores
   const [cards, setCards] = useState<CardData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFetchingData, setIsFetchingData] = useState(true);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cardPositions, setCardPositions] = useState<{
     [key: string]: { x: number; y: number };
   }>({});
 
-  // ✅ Hook para realizar la petición de red al montar el componente
   useEffect(() => {
-    const fetchCards = async () => {
+    const fetchCardData = async () => {
       try {
         const response = await fetch(CARDS_API_URL);
-        if (!response.ok) {
+        if (!response.ok)
           throw new Error('No se pudo obtener la información de las cartas.');
-        }
         const data: CardData[] = await response.json();
         setCards(data);
       } catch (e: any) {
         setError(e.message);
       } finally {
-        setIsLoading(false);
+        setIsFetchingData(false);
       }
     };
+    fetchCardData();
+  }, []);
 
-    fetchCards();
-  }, []); // El array vacío asegura que se ejecute solo una vez
-
-  // ✅ Ahora buscamos en el estado 'cards' en lugar de 'misCartas'
   const selectedItem = cards.find((c) => c.id === selectedId);
 
   const handleCardLayout = (cardId: string, event: any) => {
-    const { x, y, width, height } = event.nativeEvent.layout;
     event.target.measureInWindow((windowX: number, windowY: number) => {
+      const { width, height } = event.nativeEvent.layout;
       setCardPositions((prev) => ({
         ...prev,
         [cardId]: { x: windowX + width / 2, y: windowY + height / 2 },
@@ -70,17 +65,14 @@ export default function CardListScreen() {
     });
   };
 
-  // ✅ Renderizado condicional para el estado de carga
-  if (isLoading) {
+  if (isFetchingData) {
     return (
       <View style={[styles.container, styles.centered]}>
         <ActivityIndicator size='large' color='#fff' />
-        <Text style={styles.loadingText}>Cargando cartas...</Text>
       </View>
     );
   }
 
-  // ✅ Renderizado condicional para el estado de error
   if (error) {
     return (
       <View style={[styles.container, styles.centered]}>
@@ -90,17 +82,15 @@ export default function CardListScreen() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle={'light-content'} />
       <FlatList
         style={{ paddingHorizontal: 10 }}
-        // ✅ Usamos el estado 'cards' como fuente de datos
         data={cards}
         ListFooterComponent={
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              © 2025 Of Creatures and Realms™. All rights reserved. Unauthorized
-              reproduction or distribution is prohibited.
+              © 2025 Of Creatures and Realms™. All rights reserved.
             </Text>
           </View>
         }
@@ -143,22 +133,13 @@ export default function CardListScreen() {
           fromPosition={cardPositions[selectedItem.id]}
         />
       )}
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
-  // ✅ Estilos para centrar los indicadores
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#fff',
-    fontSize: 16,
-  },
+  centered: { justifyContent: 'center', alignItems: 'center' },
   errorText: {
     color: '#ff6b6b',
     fontSize: 16,

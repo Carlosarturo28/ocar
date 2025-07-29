@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ocar",
+    "name": "Compendium",
     "slug": "ocar",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -29,10 +29,7 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-font"
-    ],
+    "plugins": ["expo-router", "expo-font"],
     "experiments": {
       "typedRoutes": true
     },

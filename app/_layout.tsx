@@ -10,19 +10,17 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { View, ActivityIndicator, Text } from 'react-native';
+import { ImageCacheProvider, useImageCache } from '@/context/ImageCacheContext';
 import { useColorScheme } from '@/components/useColorScheme';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,7 +30,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -51,7 +48,43 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ImageCacheProvider>
+        <AppContent />
+      </ImageCacheProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+function AppContent() {
   const colorScheme = useColorScheme();
+
+  const { isLoading: areImagesLoading } = useImageCache();
+
+  if (areImagesLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#121212',
+        }}
+      >
+        <ActivityIndicator size='large' color='#fff' />
+        <Text
+          style={{
+            color: 'white',
+            marginTop: 15,
+            fontFamily: 'Cinzel_700Bold',
+          }}
+        >
+          Loading resources...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
