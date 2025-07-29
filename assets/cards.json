@@ -1,4 +1,12 @@
 [
+        {
+    "id": "Scorchback Tusker",
+    "name": "Scorchback Tusker",
+    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/05%20-%20Scorchback%20Tusker.png?raw=true",
+    "foilUrl": null,
+    "isHolo": false,
+    "maskUrl": null
+  },
     {
     "id": "Sprig",
     "name": "Sprig of endless growth",
