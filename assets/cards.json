@@ -1,32 +1,32 @@
 [
     {
-    "id": "swsh179sdf",
-    "name": "Flareon",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/04 - Sprig of Endless Growth.png",
+    "id": "Sprig",
+    "name": "Sprig of endless growth",
+    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/04%20-%20Sprig%20of%20Endless%20Growth.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
   },
     {
-    "id": "swsh179sdf",
-    "name": "Flareon",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/03 - Miscastlings.png",
+    "id": "Miscastlings",
+    "name": "Miscastlings",
+    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/03%20-%20Miscastlings.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
   },
     {
-    "id": "swsh179sdf",
-    "name": "Flareon",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/02 - The drowned vale.png",
+    "id": "drownedVale",
+    "name": "The Drowned Vale",
+    "imageUrl": "https://raw.githubusercontent.com/Carlosarturo28/ocar/main/assets/foils/02%20-%20The%20drowned%20vale.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
   },
   {
-    "id": "swsh179sdf",
-    "name": "Flareon",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/01 - Nightbone the scullbound shade.png",
+    "id": "Scullbound",
+    "name": "Scullbound",
+    "imageUrl": "https://raw.githubusercontent.com/Carlosarturo28/ocar/main/assets/foils/01%20-%20Nightbone%20the%20scullbound%20shade.png",
     "foilUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1.png",
     "isHolo": true,
     "maskUrl": ""
