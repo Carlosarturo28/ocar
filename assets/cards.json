@@ -1,4 +1,11 @@
-[        {
+[       {
+    "id": "The Vera Spire",
+    "name": "The Vera Spire",
+    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/08%20-%20The%20Vera%20Spire.png?raw=true",
+    "foilUrl": null,
+    "isHolo": true,
+    "maskUrl": null
+  }, {
     "id": "Storm phoenix",
     "name": "Storm phoenix",
     "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/07%20-%20Storm%20Phoenix.png?raw=true",
