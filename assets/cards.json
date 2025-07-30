@@ -1,14 +1,14 @@
 [       {
     "id": "The Vera Spire",
     "name": "The Vera Spire",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/08%20-%20The%20Vera%20Spire.png?raw=true",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/08_-_The_Vera_Spire_rzhsuk.png",
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
   }, {
     "id": "Storm phoenix",
     "name": "Storm phoenix",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/07%20-%20Storm%20Phoenix.png?raw=true",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/07_-_Storm_Phoenix_n259wx.png",
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
@@ -16,7 +16,7 @@
                 {
     "id": "Tears of the Storm Phoenix",
     "name": "Tears of the Storm Phoenix",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/06%20-%20Tears%20of%20the%20Storm%20Phoenix.png?raw=true",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/06_-_Tears_of_the_Storm_Phoenix_e0fn2t.png",
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
@@ -24,7 +24,7 @@
         {
     "id": "Scorchback Tusker",
     "name": "Scorchback Tusker",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/05%20-%20Scorchback%20Tusker.png?raw=true",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/05_-_Scorchback_Tusker_e7xao5.png",
     "foilUrl": null,
     "isHolo": false,
     "maskUrl": null
@@ -32,7 +32,7 @@
     {
     "id": "Sprig",
     "name": "Sprig of endless growth",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/blob/main/assets/foils/04%20-%20Sprig%20of%20Endless%20Growth.png?raw=true",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/04_-_Sprig_of_Endless_Growth_e8i4a6.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
@@ -40,7 +40,7 @@
     {
     "id": "Miscastlings",
     "name": "Miscastlings",
-    "imageUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/03%20-%20Miscastlings.png",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/03_-_Miscastlings_ubnnm0.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
@@ -48,7 +48,7 @@
     {
     "id": "drownedVale",
     "name": "The Drowned Vale",
-    "imageUrl": "https://raw.githubusercontent.com/Carlosarturo28/ocar/main/assets/foils/02%20-%20The%20drowned%20vale.png",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847316/02_-_The_drowned_vale_wfijiv.png",
     "foilUrl": "",
     "isHolo": true,
     "maskUrl": ""
@@ -56,8 +56,8 @@
   {
     "id": "Scullbound",
     "name": "Scullbound",
-    "imageUrl": "https://raw.githubusercontent.com/Carlosarturo28/ocar/main/assets/foils/01%20-%20Nightbone%20the%20scullbound%20shade.png",
-    "foilUrl": "https://github.com/Carlosarturo28/ocar/raw/main/assets/foils/1.png",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847315/01_-_Nightbone_the_scullbound_shade_pwmbhg.png",
+    "foilUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847492/1_ztpyfp.png",
     "isHolo": true,
     "maskUrl": ""
   }
