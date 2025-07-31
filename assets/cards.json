@@ -1,11 +1,13 @@
-[       {
+[
+  {
     "id": "01",
     "name": "Nightbone_the_scullbound_shade",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/01_-_Nightbone_the_scullbound_shade_xys4si.webp",
     "foilUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847492/1_ztpyfp.png",
     "isHolo": true,
     "maskUrl": null
-  }, {
+  },
+  {
     "id": "02",
     "name": "The_drowned_vale",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/02_-_The_drowned_vale_e883vt.webp",
@@ -13,7 +15,7 @@
     "isHolo": true,
     "maskUrl": null
   },
-                {
+  {
     "id": "03",
     "name": "Miscastlings",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992016/03_-_Miscastlings_dsev0s.webp",
@@ -21,7 +23,7 @@
     "isHolo": true,
     "maskUrl": null
   },
-        {
+  {
     "id": "04",
     "name": "Sprig_of_Endless_Growth",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/04_-_Sprig_of_Endless_Growth_alh2b2.webp",
@@ -29,15 +31,15 @@
     "isHolo": false,
     "maskUrl": null
   },
-    {
+  {
     "id": "05",
     "name": "Scorchback_Tusker",
-    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1754000709/20_-_Mis_Varmauth_v2ptr9.webp",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/05_-_Scorchback_Tusker_usesps.webp",
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
   },
-    {
+  {
     "id": "06",
     "name": "Tears_of_the_Storm_Phoenix",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/06_-_Tears_of_the_Storm_Phoenix_cco8up.webp",
@@ -45,7 +47,7 @@
     "isHolo": true,
     "maskUrl": null
   },
-    {
+  {
     "id": "07",
     "name": "Storm_Phoenix",
     "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/07_-_Storm_Phoenix_dje4fq.webp",
@@ -152,7 +154,7 @@
   {
     "id": "20",
     "name": "Mis_Varmauth",
-    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753999330/20_-_Mis_Varmauth_v5ccz9.webp",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1754000709/20_-_Mis_Varmauth_v2ptr9.webp",
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
