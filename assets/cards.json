@@ -148,5 +148,13 @@
     "foilUrl": null,
     "isHolo": true,
     "maskUrl": null
+  },
+  {
+    "id": "20",
+    "name": "Mis_Varmauth",
+    "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753999330/20_-_Mis_Varmauth_v5ccz9.webp",
+    "foilUrl": null,
+    "isHolo": true,
+    "maskUrl": null
   }
 ]
