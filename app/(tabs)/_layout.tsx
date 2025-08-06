@@ -32,10 +32,10 @@ const BACKGROUND_IMAGE = require('../../assets/images/tab-background.png');
 // --- NUEVO: PARÁMETROS DE ANIMACIÓN CONFIGURABLES ---
 // ¡Ajusta estos valores para cambiar la animación fácilmente!
 const ANIMATION_PARAMS = {
-  SCALE_ACTIVE: 1.35, // Escala del ícono activo (antes 1.2)
-  SCALE_INACTIVE: 1,
+  SCALE_ACTIVE: 1.65, // Escala del ícono activo (antes 1.2)
+  SCALE_INACTIVE: 1.3,
   TRANSLATE_Y_ACTIVE: -7, // Cuánto sube el ícono activo (0 es sin movimiento)
-  TRANSLATE_Y_INACTIVE: 0,
+  TRANSLATE_Y_INACTIVE: -2,
   ANIMATION_DURATION: 200, // Duración en milisegundos (antes 300)
 };
 
@@ -113,13 +113,16 @@ const CustomTabBar: React.FC<
   );
 
   const tabConfig = {
-    index: { icon: require('../../assets/images/cards.png'), name: 'My cards' },
+    index: {
+      icon: require('../../assets/images/cards.webp'),
+      name: 'My cards',
+    },
     openBooster: {
-      icon: require('../../assets/images/booster.png'),
+      icon: require('../../assets/images/booster.webp'),
       name: 'Open booster',
     },
     profile: {
-      icon: require('../../assets/images/profile.png'),
+      icon: require('../../assets/images/profile.webp'),
       name: 'My profile',
     },
   };

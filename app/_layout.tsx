@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { ImageCacheProvider, useImageCache } from '@/context/ImageCacheContext';
 import { useColorScheme } from '@/components/useColorScheme';
+import { UserProvider } from '@/context/userContext';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -87,10 +88,12 @@ function AppContent() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-      </Stack>
-    </ThemeProvider>
+    <UserProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </UserProvider>
   );
 }

@@ -1,3 +1,5 @@
+// components/Card.tsx
+
 import React, { useEffect } from 'react';
 import { useWindowDimensions, StyleSheet, Pressable } from 'react-native';
 import Animated, {
@@ -6,7 +8,6 @@ import Animated, {
   withTiming,
   interpolate,
   runOnJS,
-  SharedValue,
 } from 'react-native-reanimated';
 import { GestureContainer } from './card/GestureContainer';
 import { ImageCanvas } from './card/ImageCanvas';
@@ -17,38 +18,43 @@ export interface CardAssets {
   foil: string;
 }
 
-// ✅ Props simplificadas: solo lo esencial.
+// ✅ 1. AÑADIMOS PROPS OPCIONALES PARA EL TAMAÑO
 interface CardProps {
   images: CardAssets;
   onPress: () => void;
+  width?: number; // Ancho opcional
+  height?: number; // Alto opcional
 }
 
-export function Card({ images, onPress }: CardProps): React.JSX.Element {
+export function Card({
+  images,
+  onPress,
+  width,
+  height,
+}: CardProps): React.JSX.Element {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
 
-  // ✅ Dimensiones fijas para la tarjeta pequeña.
-  const CARD_WIDTH = SCREEN_WIDTH / 3.6;
-  const CARD_HEIGHT = 170;
-  const CARD_RADIUS = 6; // Radio fijo para la tarjeta pequeña.
+  // ✅ 2. LAS DIMENSIONES AHORA USAN LAS PROPS O EL VALOR POR DEFECTO
+  // Si le pasamos un tamaño, lo usa. Si no, usa el tamaño pequeño de la lista.
+  const CARD_WIDTH = width || SCREEN_WIDTH / 3.6;
+  const CARD_HEIGHT = height || 170;
+  const CARD_RADIUS = 6;
 
-  // ✅ Único valor animado: para la aparición inicial del componente.
   const mountProgress = useSharedValue(0);
 
-  // ✅ Animación de montaje simple.
   useEffect(() => {
-    // Usamos requestAnimationFrame para asegurar que la UI se renderice antes de animar.
     requestAnimationFrame(() => {
       mountProgress.value = withTiming(1, { duration: 700 });
     });
   }, []);
 
-  // ✅ Estilo animado solo para el montaje. El tamaño es fijo.
   const animatedContainerStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(mountProgress.value, [0, 1], [-90, 0]);
-    const opacity = interpolate(mountProgress.value, [0, 0.5], [0, 1]); // Aparece más rápido
-    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]); // Sutil efecto de escala
+    const opacity = interpolate(mountProgress.value, [0, 0.5], [0, 1]);
+    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]);
 
     return {
+      // Usamos las dimensiones calculadas (grandes o pequeñas)
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       opacity,
@@ -60,13 +66,11 @@ export function Card({ images, onPress }: CardProps): React.JSX.Element {
     };
   });
 
-  // ✅ SharedValues para los hijos, pero con valores constantes.
-  // GestureContainer/ImageCanvas podrían esperar SharedValues.
   const animatedWidth = useSharedValue(CARD_WIDTH);
   const animatedHeight = useSharedValue(CARD_HEIGHT);
   const animatedRadius = useSharedValue(CARD_RADIUS);
 
-  // --- Lógica del efecto de inclinación (sin cambios) ---
+  // El resto de la lógica de inclinación no cambia para nada...
   const [gradientCenter, setGradientCenter] = React.useState({ x: 0, y: 0 });
   const handleRotationChange = React.useCallback(
     (rx: number, ry: number) => {
@@ -77,9 +81,8 @@ export function Card({ images, onPress }: CardProps): React.JSX.Element {
         y: CARD_HEIGHT / 2 + (CARD_HEIGHT / 2) * (rx / MAX_ANGLE),
       });
     },
-    [CARD_WIDTH, CARD_HEIGHT] // Dependencias constantes
+    [CARD_WIDTH, CARD_HEIGHT]
   );
-
   const touchPosition = useSharedValue({ x: -1, y: -1 });
   const handleTouch = React.useCallback((x: number, y: number) => {
     'worklet';
@@ -107,7 +110,7 @@ export function Card({ images, onPress }: CardProps): React.JSX.Element {
             gradientCenter={gradientCenter}
             touchPosition={touchPosition}
             radius={animatedRadius}
-            isSelected={false} // ✅ Siempre es `false` en este componente
+            isSelected={false}
           />
         </GestureContainer>
       </Animated.View>
@@ -119,7 +122,6 @@ const styles = StyleSheet.create({
   cardWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    // Puedes añadir un margen si es necesario para separar las tarjetas
     margin: 8,
   },
 });
