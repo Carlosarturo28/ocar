@@ -3,16 +3,16 @@
 import { CardRevealSwiper } from '@/components/CardRevealSwiper';
 import { useUser } from '@/context/userContext';
 import { Card } from '@/types/user';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
   Text,
   SafeAreaView,
   ActivityIndicator,
-  Modal,
   Pressable,
-  Image, // Importamos Image para usar su método de precarga
+  Modal,
+  Image,
 } from 'react-native';
 
 // Función para seleccionar cartas con probabilidad ponderada
@@ -29,54 +29,14 @@ const drawWeightedCard = (cardPool: Card[]): Card | null => {
 
 export default function OpenPackScreen() {
   const { user, cardPool, isLoading, addCardsFromBooster } = useUser();
+  const [isOpening, setIsOpening] = useState(false);
   const [drawnCards, setDrawnCards] = useState<Card[] | null>(null);
-  const [isOpening, setIsOpening] = useState(false); // Estado para la animación de carga
+  const [timeLeft, setTimeLeft] = useState('');
 
   const acquiredCardIds = useMemo(() => {
     if (!user) return new Set<string>();
     return new Set(user.acquiredCards.map((c) => c.id));
   }, [user]);
-
-  const handleOpenPack = async () => {
-    if (!cardPool || cardPool.length === 0 || isOpening) return;
-
-    setIsOpening(true);
-
-    // 1. Sacamos las 5 cartas
-    const newDrawnCards: Card[] = [];
-    for (let i = 0; i < 5; i++) {
-      const newCard = drawWeightedCard(cardPool);
-      if (newCard) newDrawnCards.push(newCard);
-    }
-
-    if (newDrawnCards.length > 0) {
-      try {
-        // 2. Creamos una promesa por cada imagen que queremos precargar
-        const imagePreloadPromises = newDrawnCards.map((card) =>
-          Image.prefetch(card.imageUrl)
-        );
-
-        // 3. Esperamos a que TODAS las imágenes se hayan descargado en segundo plano
-        await Promise.all(imagePreloadPromises);
-
-        // 4. Cuando están listas, las guardamos en el estado para mostrar el modal
-        setDrawnCards(newDrawnCards);
-      } catch (error) {
-        console.error('Error al precargar las imágenes:', error);
-        // Si la precarga falla, igual mostramos las cartas
-        setDrawnCards(newDrawnCards);
-      }
-    }
-
-    setIsOpening(false);
-  };
-
-  const handleRevealComplete = () => {
-    if (drawnCards) {
-      addCardsFromBooster(drawnCards);
-    }
-    setDrawnCards(null);
-  };
 
   if (isLoading || !user) {
     return (
@@ -95,33 +55,101 @@ export default function OpenPackScreen() {
   const packsLeft = 2 - packsOpenedToday;
   const canOpenPack = packsLeft > 0 || isDebugUser;
 
+  useEffect(() => {
+    // ✅ ¡AQUÍ ESTÁ LA CORRECCIÓN!
+    // Cambiamos 'NodeJS.Timeout' por el tipo correcto, que es el tipo que devuelve setInterval.
+    // 'ReturnType<typeof setInterval>' es la forma más profesional de hacerlo.
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    if (!canOpenPack && !isDebugUser) {
+      timer = setInterval(() => {
+        const now = new Date();
+        const tomorrow = new Date();
+        tomorrow.setDate(now.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const diff = tomorrow.getTime() - now.getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const formattedTime = `${String(hours).padStart(2, '0')}:${String(
+          minutes
+        ).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        setTimeLeft(formattedTime);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [canOpenPack, isDebugUser]);
+
+  const handleOpenPack = async () => {
+    if (!cardPool || cardPool.length === 0 || isOpening) return;
+    setIsOpening(true);
+
+    const newDrawnCards: Card[] = [];
+    for (let i = 0; i < 5; i++) {
+      const newCard = drawWeightedCard(cardPool);
+      if (newCard) newDrawnCards.push(newCard);
+    }
+
+    if (newDrawnCards.length > 0) {
+      try {
+        const imagePreloadPromises = newDrawnCards.map((card) =>
+          Image.prefetch(card.imageUrl)
+        );
+        await Promise.all(imagePreloadPromises);
+        setDrawnCards(newDrawnCards);
+      } catch (error) {
+        console.error('Error al precargar las imágenes:', error);
+        setDrawnCards(newDrawnCards);
+      }
+    }
+
+    setIsOpening(false);
+  };
+
+  const handleRevealComplete = () => {
+    if (drawnCards) {
+      addCardsFromBooster(drawnCards);
+    }
+    setDrawnCards(null);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Pressable
-          onPress={handleOpenPack}
-          disabled={!canOpenPack || isLoading || isOpening}
-        >
-          <View style={styles.boosterPlaceholder}>
-            {isOpening ? (
-              <ActivityIndicator size='large' color='#c7a568' />
-            ) : (
-              <Text style={styles.boosterText}>TOCA PARA ABRIR</Text>
-            )}
+      {canOpenPack ? (
+        <View style={styles.content}>
+          <Pressable onPress={handleOpenPack} disabled={isLoading || isOpening}>
+            <View style={styles.boosterPlaceholder}>
+              {isOpening ? (
+                <ActivityIndicator size='large' color='#c7a568' />
+              ) : (
+                <Text style={styles.boosterText}>TOCA PARA ABRIR</Text>
+              )}
+            </View>
+          </Pressable>
+          <View style={styles.statusBox}>
+            <Text style={styles.statusValue}>
+              {isDebugUser ? '∞' : packsLeft}
+            </Text>
+            <Text style={styles.statusLabel}>Sobres restantes hoy</Text>
           </View>
-        </Pressable>
-
-        <View style={styles.statusBox}>
-          <Text style={styles.statusValue}>
-            {canOpenPack ? (isDebugUser ? '∞' : packsLeft) : 0}
-          </Text>
-          <Text style={styles.statusLabel}>Sobres restantes hoy</Text>
+          {isDebugUser && (
+            <Text style={styles.debugText}>MODO DEBUG ACTIVADO</Text>
+          )}
         </View>
-
-        {isDebugUser && (
-          <Text style={styles.debugText}>MODO DEBUG ACTIVADO</Text>
-        )}
-      </View>
+      ) : (
+        <View style={styles.content}>
+          <Text style={styles.title}>Límite Diario</Text>
+          <View style={styles.countdownBox}>
+            <Text style={styles.countdownLabel}>Próximo sobre en:</Text>
+            <Text style={styles.countdownTimer}>{timeLeft}</Text>
+          </View>
+          <Text style={styles.comebackText}>
+            Vuelve pronto para seguir ampliando tu colección.
+          </Text>
+        </View>
+      )}
 
       <Modal
         animationType='fade'
@@ -171,13 +199,48 @@ const styles = StyleSheet.create({
     fontFamily: 'Cinzel_700Bold',
     textAlign: 'center',
   },
-  debugText: {
-    color: '#fdd835',
-    position: 'absolute',
-    bottom: 120,
-    fontWeight: 'bold',
-  },
   statusBox: { alignItems: 'center', marginVertical: 40 },
   statusValue: { fontSize: 72, color: '#fff', fontWeight: 'bold' },
   statusLabel: { fontSize: 18, color: '#c7a568', marginTop: 4 },
+  debugText: {
+    color: '#fdd835',
+    position: 'absolute',
+    bottom: 20,
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 42,
+    color: '#fff',
+    fontFamily: 'Cinzel_700Bold',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  countdownBox: {
+    alignItems: 'center',
+    marginVertical: 40,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#c7a568',
+    borderRadius: 15,
+    backgroundColor: '#1C1C1E',
+  },
+  countdownLabel: {
+    fontSize: 18,
+    color: '#c7a568',
+    fontFamily: 'Cinzel_400Regular',
+  },
+  countdownTimer: {
+    fontSize: 64,
+    color: '#fff',
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    marginTop: 10,
+  },
+  comebackText: {
+    color: '#aaa',
+    marginTop: 40,
+    fontSize: 16,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
 });
