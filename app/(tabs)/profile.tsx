@@ -53,12 +53,12 @@ export default function ProfileScreen() {
 
   const handleResetPress = () => {
     Alert.alert(
-      'Borrar Progreso',
-      '¿Estás seguro de que quieres borrar tu cuenta? Perderás todo tu progreso. Esta acción no se puede deshacer.',
+      'Erase Progress',
+      'Are you sure you want to erase your progress?',
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Sí, borrar todo',
+          text: 'Yes, erase all',
           onPress: resetAccount,
           style: 'destructive',
         },
@@ -89,7 +89,7 @@ export default function ProfileScreen() {
             <Text style={styles.username}>{user?.username}</Text>
           )}
           <Button
-            title={isEditing ? 'Guardar' : 'Editar'}
+            title={isEditing ? 'Save' : 'Edit'}
             color='#c7a568'
             onPress={() =>
               isEditing ? handleSaveUsername() : setIsEditing(true)
@@ -98,23 +98,23 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Estadísticas Generales</Text>
+          <Text style={styles.sectionTitle}>General Statistics</Text>
           <View style={styles.generalStatsContainer}>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>
                 {user?.acquiredCards.length ?? 0}
               </Text>
-              <Text style={styles.statLabel}>Cartas Únicas</Text>
+              <Text style={styles.statLabel}>Unique Cards</Text>
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{stats?.totalHolo ?? 0}</Text>
-              <Text style={styles.statLabel}>Holográficas</Text>
+              <Text style={styles.statLabel}>Holo</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Colección por Afinidad</Text>
+          <Text style={styles.sectionTitle}>Collection by Affinity</Text>
           <View style={styles.affinityGrid}>
             {stats &&
               Object.entries(stats.byAffinity).map(([affinity, count]) => (
@@ -132,7 +132,7 @@ export default function ProfileScreen() {
 
         <View style={styles.dangerZone}>
           <Button
-            title='Empezar de Cero'
+            title='Start Over'
             color='#ff3b30'
             onPress={handleResetPress}
           />

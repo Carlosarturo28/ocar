@@ -1,6 +1,6 @@
 // components/CardRevealSwiper.tsx
 
-import React, { useState } from 'react'; // <-- Importamos useState
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,47 +12,45 @@ import Swiper from 'react-native-deck-swiper';
 import { Card as CardData } from '../types/user';
 import { Card as CardComponent } from '@/components/Card';
 
+// Exporting this type so OpenPackScreen knows what data structure to send
+export interface RevealedCard {
+  card: CardData;
+  isDuplicate: boolean;
+}
+
 interface CardRevealSwiperProps {
-  cards: CardData[];
-  acquiredCardIds: Set<string>;
+  revealedItems: RevealedCard[];
   onSwipedAll: () => void;
 }
 
 export const CardRevealSwiper = ({
-  cards,
-  acquiredCardIds,
+  revealedItems,
   onSwipedAll,
 }: CardRevealSwiperProps) => {
   const { width: screenWidth } = useWindowDimensions();
-
-  // ✅ 1. AÑADIMOS UN ESTADO PARA LLEVAR LA CUENTA
-  // Empieza en 0 y lo actualizaremos cada vez que se haga un swipe.
   const [swipedCardIndex, setSwipedCardIndex] = useState(0);
 
   const cardWidth = screenWidth * 0.85;
   const cardHeight = cardWidth * 1.4;
 
   const handleSwiped = () => {
-    // Actualizamos el contador cada vez que se desliza una carta
     setSwipedCardIndex((prevIndex) => prevIndex + 1);
   };
 
   return (
-    // Envolvemos todo en un SafeAreaView para que el contador no se pegue al notch
     <SafeAreaView style={styles.container}>
-      {/* ✅ 2. EL CONTADOR */}
       <View style={styles.counterContainer}>
         <Text style={styles.counterText}>
-          {/* Mostramos el número de la carta actual y el total */}
-          {swipedCardIndex + 1} / {cards.length}
+          {swipedCardIndex + 1} / {revealedItems.length}
         </Text>
       </View>
 
       <Swiper
-        cards={cards}
-        renderCard={(card: CardData) => {
-          if (!card) return null;
-          const isDuplicate = acquiredCardIds.has(card.id);
+        cards={revealedItems}
+        renderCard={(item: RevealedCard) => {
+          if (!item) return null;
+
+          const { card, isDuplicate } = item;
 
           return (
             <View style={styles.cardWrapper}>
@@ -67,21 +65,18 @@ export const CardRevealSwiper = ({
                 height={cardHeight}
               />
 
-              {isDuplicate && (
+              {isDuplicate ? (
                 <View style={styles.duplicateBanner}>
-                  <Text style={styles.bannerText}>REPETIDA</Text>
+                  <Text style={styles.bannerText}>DUPLICATE</Text>
                 </View>
-              )}
-
-              {!isDuplicate && (
+              ) : (
                 <View style={[styles.duplicateBanner, styles.newBanner]}>
-                  <Text style={[styles.bannerText, styles.newText]}>NUEVA</Text>
+                  <Text style={[styles.bannerText, styles.newText]}>NEW</Text>
                 </View>
               )}
             </View>
           );
         }}
-        // ✅ 3. LLAMAMOS A LA FUNCIÓN EN CADA SWIPE
         onSwiped={handleSwiped}
         onSwipedAll={onSwipedAll}
         stackSize={3}
@@ -91,7 +86,7 @@ export const CardRevealSwiper = ({
         disableTopSwipe
         disableBottomSwipe
       />
-      <Text style={styles.instructions}>Desliza para revelar tus cartas</Text>
+      <Text style={styles.instructions}>Swipe to reveal your cards</Text>
     </SafeAreaView>
   );
 };
@@ -102,20 +97,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
   },
-  // Estilo para el contenedor del contador en la parte superior
   counterContainer: {
     position: 'absolute',
-    top: 20, // Lo separamos un poco de la parte de arriba
+    top: 20,
     width: '100%',
     alignItems: 'center',
-    zIndex: 20, // Aseguramos que esté por encima de todo
+    zIndex: 20,
   },
-  // Estilo para el texto del contador
   counterText: {
     color: 'rgba(255, 255, 255, 0.7)',
     fontSize: 24,
     fontWeight: 'bold',
-    fontFamily: 'Cinzel_700Bold', // Usamos la misma fuente para consistencia
+    fontFamily: 'Cinzel_700Bold',
   },
   cardWrapper: {
     justifyContent: 'center',

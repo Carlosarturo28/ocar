@@ -1,9 +1,9 @@
 // screens/OpenPackScreen.tsx
 
-import { CardRevealSwiper } from '@/components/CardRevealSwiper';
+import { RevealedCard, CardRevealSwiper } from '@/components/CardRevealSwiper';
 import { useUser } from '@/context/userContext';
 import { Card } from '@/types/user';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -15,7 +15,7 @@ import {
   Image,
 } from 'react-native';
 
-// Función para seleccionar cartas con probabilidad ponderada
+// Function to select cards with weighted probability
 const drawWeightedCard = (cardPool: Card[]): Card | null => {
   if (!cardPool || cardPool.length === 0) return null;
   const totalWeight = cardPool.reduce((sum, card) => sum + card.probability, 0);
@@ -30,13 +30,10 @@ const drawWeightedCard = (cardPool: Card[]): Card | null => {
 export default function OpenPackScreen() {
   const { user, cardPool, isLoading, addCardsFromBooster } = useUser();
   const [isOpening, setIsOpening] = useState(false);
-  const [drawnCards, setDrawnCards] = useState<Card[] | null>(null);
+  const [revealedCards, setRevealedCards] = useState<RevealedCard[] | null>(
+    null
+  );
   const [timeLeft, setTimeLeft] = useState('');
-
-  const acquiredCardIds = useMemo(() => {
-    if (!user) return new Set<string>();
-    return new Set(user.acquiredCards.map((c) => c.id));
-  }, [user]);
 
   if (isLoading || !user) {
     return (
@@ -56,11 +53,7 @@ export default function OpenPackScreen() {
   const canOpenPack = packsLeft > 0 || isDebugUser;
 
   useEffect(() => {
-    // ✅ ¡AQUÍ ESTÁ LA CORRECCIÓN!
-    // Cambiamos 'NodeJS.Timeout' por el tipo correcto, que es el tipo que devuelve setInterval.
-    // 'ReturnType<typeof setInterval>' es la forma más profesional de hacerlo.
     let timer: ReturnType<typeof setInterval> | null = null;
-
     if (!canOpenPack && !isDebugUser) {
       timer = setInterval(() => {
         const now = new Date();
@@ -98,10 +91,25 @@ export default function OpenPackScreen() {
           Image.prefetch(card.imageUrl)
         );
         await Promise.all(imagePreloadPromises);
-        setDrawnCards(newDrawnCards);
+
+        const seenInThisSession = new Set<string>(
+          user.acquiredCards.map((c) => c.id)
+        );
+
+        const processedCards = newDrawnCards.map((card) => {
+          const isDuplicate = seenInThisSession.has(card.id);
+          if (!isDuplicate) {
+            seenInThisSession.add(card.id);
+          }
+          return { card: card, isDuplicate: isDuplicate };
+        });
+
+        setRevealedCards(processedCards);
       } catch (error) {
-        console.error('Error al precargar las imágenes:', error);
-        setDrawnCards(newDrawnCards);
+        console.error('Error preloading images:', error);
+        setRevealedCards(
+          newDrawnCards.map((card) => ({ card, isDuplicate: false }))
+        );
       }
     }
 
@@ -109,10 +117,10 @@ export default function OpenPackScreen() {
   };
 
   const handleRevealComplete = () => {
-    if (drawnCards) {
-      addCardsFromBooster(drawnCards);
+    if (revealedCards) {
+      addCardsFromBooster(revealedCards.map((item) => item.card));
     }
-    setDrawnCards(null);
+    setRevealedCards(null);
   };
 
   return (
@@ -124,7 +132,7 @@ export default function OpenPackScreen() {
               {isOpening ? (
                 <ActivityIndicator size='large' color='#c7a568' />
               ) : (
-                <Text style={styles.boosterText}>TOCA PARA ABRIR</Text>
+                <Text style={styles.boosterText}>TAP TO OPEN</Text>
               )}
             </View>
           </Pressable>
@@ -132,21 +140,21 @@ export default function OpenPackScreen() {
             <Text style={styles.statusValue}>
               {isDebugUser ? '∞' : packsLeft}
             </Text>
-            <Text style={styles.statusLabel}>Sobres restantes hoy</Text>
+            <Text style={styles.statusLabel}>Packs left today</Text>
           </View>
           {isDebugUser && (
-            <Text style={styles.debugText}>MODO DEBUG ACTIVADO</Text>
+            <Text style={styles.debugText}>DEBUG MODE ACTIVE</Text>
           )}
         </View>
       ) : (
         <View style={styles.content}>
-          <Text style={styles.title}>Límite Diario</Text>
+          <Text style={styles.title}>Daily Limit</Text>
           <View style={styles.countdownBox}>
-            <Text style={styles.countdownLabel}>Próximo sobre en:</Text>
+            <Text style={styles.countdownLabel}>Next pack in:</Text>
             <Text style={styles.countdownTimer}>{timeLeft}</Text>
           </View>
           <Text style={styles.comebackText}>
-            Vuelve pronto para seguir ampliando tu colección.
+            Come back soon to expand your collection.
           </Text>
         </View>
       )}
@@ -154,13 +162,12 @@ export default function OpenPackScreen() {
       <Modal
         animationType='fade'
         transparent={true}
-        visible={drawnCards !== null}
+        visible={revealedCards !== null}
         onRequestClose={handleRevealComplete}
       >
-        {drawnCards && (
+        {revealedCards && (
           <CardRevealSwiper
-            cards={drawnCards}
-            acquiredCardIds={acquiredCardIds}
+            revealedItems={revealedCards}
             onSwipedAll={handleRevealComplete}
           />
         )}
