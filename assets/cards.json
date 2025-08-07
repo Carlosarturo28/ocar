@@ -15,7 +15,7 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Umbral",
-        "probability": 0.002
+        "probability": 0.03
       },
       {
         "id": "02",
