@@ -15,7 +15,7 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Umbral",
-        "probability": 0.02
+        "probability": 0.002
       },
       {
         "id": "02",
@@ -225,6 +225,17 @@
         "type": "Creature",
         "affinity": "Arcane",
         "probability": 0.2
+      },
+      {
+        "id": "21",
+        "name": "Skullies",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1754592221/21_-_Skullies_qtarnl.webp",
+        "foilUrl": null,
+        "isHolo": true,
+        "maskUrl": null,
+        "type": "Servants",
+        "affinity": "Umbral",
+        "probability": 0.5
       }
     ]
   }
