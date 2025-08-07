@@ -164,7 +164,7 @@ export default function OpenPackScreen() {
                 <ActivityIndicator size='large' color='#c7a568' />
               ) : (
                 <Image
-                  source={require('@/assets/images/booster.png')}
+                  source={require('@/assets/images/booster-floating.png')}
                   style={styles.boosterImage}
                 />
               )}
