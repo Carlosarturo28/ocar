@@ -1,16 +1,17 @@
 // components/CardRevealSwiper.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   useWindowDimensions,
   SafeAreaView,
+  Image,
+  Pressable,
 } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { Card as CardData } from '../types/user';
-import { Card as CardComponent } from '@/components/Card';
 
 // Exporting this type so OpenPackScreen knows what data structure to send
 export interface RevealedCard {
@@ -37,6 +38,40 @@ export const CardRevealSwiper = ({
     setSwipedCardIndex((prevIndex) => prevIndex + 1);
   };
 
+  const renderCard = useCallback(
+    (item: RevealedCard) => {
+      if (!item) return null;
+
+      const { card, isDuplicate } = item;
+
+      return (
+        <View style={styles.cardWrapper}>
+          <Pressable
+            style={{
+              width: cardWidth,
+              height: cardHeight,
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}
+          >
+            <Image style={styles.cardImage} source={{ uri: card.imageUrl }} />
+          </Pressable>
+
+          {isDuplicate ? (
+            <View style={styles.duplicateBanner}>
+              <Text style={styles.bannerText}>DUPLICATE</Text>
+            </View>
+          ) : (
+            <View style={[styles.duplicateBanner, styles.newBanner]}>
+              <Text style={[styles.bannerText, styles.newText]}>NEW</Text>
+            </View>
+          )}
+        </View>
+      );
+    },
+    [cardWidth, cardHeight]
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.counterContainer}>
@@ -47,44 +82,16 @@ export const CardRevealSwiper = ({
 
       <Swiper
         cards={revealedItems}
-        renderCard={(item: RevealedCard) => {
-          if (!item) return null;
-
-          const { card, isDuplicate } = item;
-
-          return (
-            <View style={styles.cardWrapper}>
-              <CardComponent
-                images={{
-                  base: card.imageUrl,
-                  mask: card.maskUrl,
-                  foil: card.foilUrl,
-                }}
-                onPress={() => {}}
-                width={cardWidth}
-                height={cardHeight}
-              />
-
-              {isDuplicate ? (
-                <View style={styles.duplicateBanner}>
-                  <Text style={styles.bannerText}>DUPLICATE</Text>
-                </View>
-              ) : (
-                <View style={[styles.duplicateBanner, styles.newBanner]}>
-                  <Text style={[styles.bannerText, styles.newText]}>NEW</Text>
-                </View>
-              )}
-            </View>
-          );
-        }}
+        renderCard={renderCard}
         onSwiped={handleSwiped}
         onSwipedAll={onSwipedAll}
-        stackSize={3}
-        stackSeparation={18}
+        stackSize={2}
+        stackSeparation={6}
         backgroundColor={'transparent'}
         cardStyle={{ justifyContent: 'center', alignItems: 'center' }}
         disableTopSwipe
         disableBottomSwipe
+        stackAnimationTension={200}
       />
       <Text style={styles.instructions}>Swipe to reveal your cards</Text>
     </SafeAreaView>
@@ -113,6 +120,10 @@ const styles = StyleSheet.create({
   cardWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
   },
   duplicateBanner: {
     position: 'absolute',

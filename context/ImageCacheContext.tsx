@@ -1,4 +1,4 @@
-// src/context/ImageCacheContext.tsx (SIMPLIFICADO Y CORREGIDO)
+// src/context/ImageCacheContext.tsx
 
 import React, {
   createContext,
@@ -13,6 +13,28 @@ import { Skia, SkImage, useImage } from '@shopify/react-native-skia';
 
 const CARDS_API_URL =
   'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json';
+
+interface Card {
+  id: string;
+  name: string;
+  imageUrl: string;
+  foilUrl: string | null;
+  isHolo: boolean;
+  maskUrl: string | null;
+  type: string;
+  affinity: string;
+  probability: number;
+}
+
+interface Expansion {
+  id: number;
+  name: string;
+  description: string;
+  releaseYear: number;
+  logoUrl: string;
+  cards: Card[];
+}
+// --- END OF TYPE DEFINITIONS ---
 
 // Configuración de optimización
 const BATCH_SIZE = 5;
@@ -164,19 +186,20 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const cards = await response.json();
+        const expansionData: Expansion[] = await response.json();
 
         if (!isMounted) {
           return;
         }
 
-        if (!Array.isArray(cards)) {
-          throw new Error('La respuesta no es un array válido');
+        if (!Array.isArray(expansionData)) {
+          throw new Error('La respuesta no es un array válido de expansiones');
         }
 
         const imageUrls = Array.from(
           new Set(
-            cards
+            expansionData
+              .flatMap((expansion) => expansion.cards || [])
               .flatMap((card) => [card.imageUrl, card.maskUrl, card.foilUrl])
               .filter(
                 (url): url is string =>
@@ -215,7 +238,6 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [loadImagesInBatches]);
 
-  // Funciones del contexto (solo para URLs remotas)
   const preloadImage = useCallback(
     async (uri: string): Promise<SkImage | null> => {
       if (imageCache[uri]) {
@@ -286,14 +308,11 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
 export const useImageCache = () => {
   const context = useContext(ImageCacheContext);
   if (context === undefined) {
-    throw new Error(
-      'useImageCache debe ser usado dentro de un ImageCacheProvider'
-    );
+    throw new Error('useImageCache must be used within an ImageCacheProvider');
   }
   return context;
 };
 
-// Hook adicional para monitorear el progreso de carga
 export const useImageCacheProgress = () => {
   const { loadingProgress, isLoading } = useImageCache();
 
@@ -309,13 +328,10 @@ export const useImageCacheProgress = () => {
   };
 };
 
-// Hook para assets locales (mejorado)
 export const useLocalImage = (asset: any): SkImage | null => {
-  // Usar directamente el hook de Skia con require()
   return useImage(asset);
 };
 
-// Hook para cargar assets con ruta string
 export const useLocalImageFromPath = (assetPath: string) => {
   const [image, setImage] = useState<SkImage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -329,20 +345,13 @@ export const useLocalImageFromPath = (assetPath: string) => {
         setIsLoading(true);
         setError(null);
 
-        // Intentar diferentes formas de resolver la ruta
         let resolvedUri: string;
 
-        // Si ya es una URI válida
         if (assetPath.startsWith('http') || assetPath.startsWith('file://')) {
           resolvedUri = assetPath;
         } else {
-          // Para rutas relativas, necesitamos usar bundle
-          const { resolveAssetSource } = require('react-native');
-
-          // Esto requiere que tengas el asset importado
-          // Mejor usar require() directamente
           throw new Error(
-            'Usa require() en lugar de rutas string para assets locales'
+            'Use require() instead of string paths for local assets'
           );
         }
 
@@ -356,7 +365,7 @@ export const useLocalImageFromPath = (assetPath: string) => {
       } catch (err) {
         console.error('Error loading local image:', err);
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Error desconocido');
+          setError(err instanceof Error ? err.message : 'Unknown error');
           setIsLoading(false);
         }
       }
@@ -372,7 +381,6 @@ export const useLocalImageFromPath = (assetPath: string) => {
   return { image, isLoading, error };
 };
 
-// Hook para precargar assets locales en el cache principal
 export const usePreloadLocalAssets = () => {
   const { preloadImage } = useImageCache();
 

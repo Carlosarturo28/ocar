@@ -34,8 +34,6 @@ export function Card({
 }: CardProps): React.JSX.Element {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
 
-  // ✅ 2. LAS DIMENSIONES AHORA USAN LAS PROPS O EL VALOR POR DEFECTO
-  // Si le pasamos un tamaño, lo usa. Si no, usa el tamaño pequeño de la lista.
   const CARD_WIDTH = width || SCREEN_WIDTH / 3.6;
   const CARD_HEIGHT = height || 170;
   const CARD_RADIUS = 6;
@@ -88,7 +86,6 @@ export function Card({
     'worklet';
     touchPosition.value = { x, y };
   }, []);
-  // --- Fin de la lógica de inclinación ---
 
   return (
     <Pressable onPress={onPress}>

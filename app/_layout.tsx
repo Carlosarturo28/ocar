@@ -1,5 +1,9 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useFonts, Cinzel_700Bold } from '@expo-google-fonts/cinzel';
+import {
+  useFonts,
+  Cinzel_700Bold,
+  Cinzel_400Regular,
+} from '@expo-google-fonts/cinzel';
 import {
   DarkTheme,
   DefaultTheme,
@@ -11,10 +15,11 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text, StatusBar } from 'react-native';
 import { ImageCacheProvider, useImageCache } from '@/context/ImageCacheContext';
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserProvider } from '@/context/userContext';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -28,6 +33,7 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     Cinzel_700Bold,
+    Cinzel_400Regular,
     ...FontAwesome.font,
   });
 
@@ -51,9 +57,11 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ImageCacheProvider>
-        <AppContent />
-      </ImageCacheProvider>
+      <BottomSheetModalProvider>
+        <ImageCacheProvider>
+          <AppContent />
+        </ImageCacheProvider>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }
@@ -73,6 +81,7 @@ function AppContent() {
           backgroundColor: '#121212',
         }}
       >
+        <StatusBar barStyle='light-content' />
         <ActivityIndicator size='large' color='#fff' />
         <Text
           style={{

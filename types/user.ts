@@ -17,6 +17,15 @@ export interface Card {
   probability: number;
 }
 
+export interface Expansion {
+  id: number;
+  name: string;
+  description: string;
+  releaseYear: number;
+  logoUrl?: string;
+  cards: Card[];
+}
+
 // Estructura del usuario, con los nuevos campos para el límite de sobres
 export interface User {
   username: string;
@@ -28,6 +37,7 @@ export interface User {
 // Estructura del valor que provee nuestro Contexto
 export type UserContextType = {
   user: User | null;
+  expansions: Expansion[];
   cardPool: Card[];
   isLoading: boolean;
   updateUsername: (newUsername: string) => Promise<void>;

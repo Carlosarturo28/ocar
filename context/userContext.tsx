@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { Alert } from 'react-native'; // Alert se mantiene por si se usa en otras funciones como resetAccount
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Card, UserContextType } from '../types/user';
+import { User, Card, UserContextType, Expansion } from '../types/user';
 
 export const UserContext = createContext<UserContextType | undefined>(
   undefined
@@ -21,6 +21,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [expansions, setExpansions] = useState<Expansion[]>([]);
   const [cardPool, setCardPool] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -48,13 +49,17 @@ export const UserProvider = ({ children }: UserProviderProps) => {
           const response = await fetch(
             'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json'
           );
-          if (!response.ok)
-            throw new Error(
-              `Error al cargar las cartas: ${response.statusText}`
-            );
-          const cardsData = await response.json();
-          setCardPool(cardsData as Card[]);
+          if (!response.ok) throw new Error('Failed to fetch card data');
+
+          const expansionsData = (await response.json()) as Expansion[];
+          setExpansions(expansionsData);
+
+          const allCards = expansionsData.flatMap(
+            (expansion) => expansion.cards
+          );
+          setCardPool(allCards);
         };
+
         await Promise.all([userLoader(), cardLoader()]);
       } catch (error) {
         console.error('Error al cargar los datos iniciales:', error);
@@ -124,7 +129,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       const newUser = createNewUser();
       await AsyncStorage.setItem('user', JSON.stringify(newUser));
       setUser(newUser);
-      Alert.alert('Progreso Borrado', 'Tu cuenta ha sido reseteada.');
+      Alert.alert('Progress erased', 'Your account has been reset.');
     } catch (error) {
       console.error('Error al resetear la cuenta:', error);
     }
@@ -134,6 +139,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     <UserContext.Provider
       value={{
         user,
+        expansions,
         cardPool,
         isLoading,
         updateUsername,

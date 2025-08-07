@@ -14,6 +14,7 @@ import {
   SafeAreaView,
   Alert,
   Image,
+  StatusBar,
 } from 'react-native';
 // Asumo que tienes estos iconos en la ruta especificada.
 // Crea una carpeta 'icons' dentro de 'assets' para ellos.
@@ -76,6 +77,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle='light-content' backgroundColor='#121212' />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           {isEditing ? (

@@ -14,8 +14,15 @@ import {
   Modal,
   Image,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
-// Function to select cards with weighted probability
 const drawWeightedCard = (cardPool: Card[]): Card | null => {
   if (!cardPool || cardPool.length === 0) return null;
   const totalWeight = cardPool.reduce((sum, card) => sum + card.probability, 0);
@@ -24,7 +31,24 @@ const drawWeightedCard = (cardPool: Card[]): Card | null => {
     randomNum -= card.probability;
     if (randomNum <= 0) return card;
   }
-  return cardPool[cardPool.length - 1]; // Fallback
+  return cardPool[cardPool.length - 1];
+};
+
+const calculateTimeLeft = (): string => {
+  const now = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const diff = tomorrow.getTime() - now.getTime();
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0'
+  )}:${String(seconds).padStart(2, '0')}`;
 };
 
 export default function OpenPackScreen() {
@@ -33,7 +57,19 @@ export default function OpenPackScreen() {
   const [revealedCards, setRevealedCards] = useState<RevealedCard[] | null>(
     null
   );
-  const [timeLeft, setTimeLeft] = useState('');
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(-5, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(5, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      true
+    );
+  }, []);
 
   if (isLoading || !user) {
     return (
@@ -56,18 +92,7 @@ export default function OpenPackScreen() {
     let timer: ReturnType<typeof setInterval> | null = null;
     if (!canOpenPack && !isDebugUser) {
       timer = setInterval(() => {
-        const now = new Date();
-        const tomorrow = new Date();
-        tomorrow.setDate(now.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        const diff = tomorrow.getTime() - now.getTime();
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        const formattedTime = `${String(hours).padStart(2, '0')}:${String(
-          minutes
-        ).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        setTimeLeft(formattedTime);
+        setTimeLeft(calculateTimeLeft());
       }, 1000);
     }
     return () => {
@@ -123,18 +148,27 @@ export default function OpenPackScreen() {
     setRevealedCards(null);
   };
 
+  const floatingStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }],
+    };
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       {canOpenPack ? (
         <View style={styles.content}>
           <Pressable onPress={handleOpenPack} disabled={isLoading || isOpening}>
-            <View style={styles.boosterPlaceholder}>
+            <Animated.View style={[styles.boosterContainer, floatingStyle]}>
               {isOpening ? (
                 <ActivityIndicator size='large' color='#c7a568' />
               ) : (
-                <Text style={styles.boosterText}>TAP TO OPEN</Text>
+                <Image
+                  source={require('@/assets/images/booster.png')}
+                  style={styles.boosterImage}
+                />
               )}
-            </View>
+            </Animated.View>
           </Pressable>
           <View style={styles.statusBox}>
             <Text style={styles.statusValue}>
@@ -161,7 +195,7 @@ export default function OpenPackScreen() {
 
       <Modal
         animationType='fade'
-        transparent={true}
+        transparent={false}
         visible={revealedCards !== null}
         onRequestClose={handleRevealComplete}
       >
@@ -190,25 +224,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  boosterPlaceholder: {
-    width: 250,
+  boosterContainer: {
+    width: 350,
     height: 350,
-    backgroundColor: '#333',
-    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#c7a568',
   },
-  boosterText: {
-    color: '#c7a568',
-    fontSize: 24,
-    fontFamily: 'Cinzel_700Bold',
-    textAlign: 'center',
+  boosterImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
   statusBox: { alignItems: 'center', marginVertical: 40 },
-  statusValue: { fontSize: 72, color: '#fff', fontWeight: 'bold' },
-  statusLabel: { fontSize: 18, color: '#c7a568', marginTop: 4 },
+  statusValue: { fontSize: 72, color: '#fff', fontFamily: 'Cinzel_700Bold' },
+  statusLabel: {
+    fontSize: 18,
+    color: '#c7a568',
+    marginTop: 4,
+    fontFamily: 'Cinzel_400Regular',
+  },
   debugText: {
     color: '#fdd835',
     position: 'absolute',
@@ -234,13 +268,12 @@ const styles = StyleSheet.create({
   countdownLabel: {
     fontSize: 18,
     color: '#c7a568',
-    fontFamily: 'Cinzel_400Regular',
+    fontFamily: 'Cinzel_700Bold',
   },
   countdownTimer: {
     fontSize: 64,
     color: '#fff',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
+    fontFamily: 'Cinzel_700Bold',
     marginTop: 10,
   },
   comebackText: {
@@ -249,5 +282,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     paddingHorizontal: 20,
+    fontFamily: 'Cinzel_400Regular',
   },
 });

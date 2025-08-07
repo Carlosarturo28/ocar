@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from 'react';
+// screens/CardListScreen.tsx
+
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
   View,
+  SectionList,
   FlatList,
   StyleSheet,
   Text,
@@ -9,42 +12,68 @@ import {
   Image,
   SafeAreaView,
   LayoutChangeEvent,
-  useWindowDimensions, // Importamos para calcular el ancho
+  useWindowDimensions,
+  Pressable,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-// --- Componentes de UI ---
-import { Card as CardComponent } from '@/components/Card'; // Asumo que esta es la ruta a tu Card.tsx
+// --- UI Components & Context ---
+import { Card as CardComponent } from '@/components/Card';
 import { AnimatedSelectedCard } from '@/components/card/AnimatedSelectedCard';
+import { ExpansionDetailSheet } from '@/components/ExpansionDetailSheet';
 import { useUser } from '@/context/userContext';
+import { Expansion } from '@/types/user';
 
-// --- Recursos Locales ---
-// Si el alias '@' no funciona, usa una ruta relativa como '../../assets/images/back.webp'
+// --- Local Resources ---
 const CARD_BACK_IMAGE = require('@/assets/images/back.webp');
-const LOGO_IMAGE = require('../../assets/logo.png'); // Asegúrate que la ruta es correcta
+const LOGO_IMAGE = require('@/assets/logo.png');
+const INFO_ICON_IMAGE = require('@/assets/images/info-icon.png');
 
 export default function CardListScreen() {
-  // Obtenemos el ancho de la pantalla para que los cálculos coincidan con Card.tsx
   const { width: SCREEN_WIDTH } = useWindowDimensions();
-  const { user, cardPool, isLoading } = useUser();
+  const { user, isLoading, expansions } = useUser();
 
-  // Estados locales para la interactividad de la UI
+  const [selectedExpansion, setSelectedExpansion] = useState<Expansion | null>(
+    null
+  );
+  const bottomSheetModalRef = useRef<BottomSheetModal | null>(null);
+
+  const handlePresentModalPress = useCallback((expansion: Expansion) => {
+    setSelectedExpansion(expansion);
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const cardPool = useMemo(
+    () => expansions.flatMap((exp) => exp.cards || []),
+    [expansions]
+  );
+
+  const sections = useMemo(
+    () =>
+      expansions.map((exp) => ({
+        ...exp,
+        data: [exp.cards || []],
+      })),
+    [expansions]
+  );
+
+  const CARD_WIDTH = SCREEN_WIDTH / 3.6;
+  const CARD_HEIGHT = 170;
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cardPositions, setCardPositions] = useState<{
     [key: string]: { x: number; y: number };
   }>({});
 
-  // Memoizamos un Set con los IDs de las cartas del usuario para búsquedas eficientes
   const acquiredCardIds = useMemo(() => {
     if (!user) return new Set<string>();
     return new Set(user.acquiredCards.map((c) => c.id));
   }, [user]);
 
-  // Encontramos el objeto de la carta seleccionada en el pool completo
   const selectedItem = cardPool.find((c) => c.id === selectedId);
 
-  // Mide la posición de una carta en la pantalla para la animación
   const handleCardLayout = (cardId: string, event: LayoutChangeEvent) => {
-    // La medición no es crítica para el layout, pero sí para la animación de apertura
     event.target.measureInWindow((x, y, width, height) => {
       setCardPositions((prev) => ({
         ...prev,
@@ -61,11 +90,11 @@ export default function CardListScreen() {
     );
   }
 
-  if (!cardPool || cardPool.length === 0) {
+  if (!expansions || expansions.length === 0) {
     return (
       <View style={[styles.container, styles.centered]}>
         <Text style={styles.errorText}>
-          Error: No se pudieron cargar las cartas.
+          Error: Could not load card expansions.
         </Text>
       </View>
     );
@@ -73,12 +102,15 @@ export default function CardListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={'light-content'} />
-      <FlatList
-        style={styles.list}
-        data={cardPool}
-        numColumns={3}
-        keyExtractor={(item) => item.id}
+      <StatusBar barStyle='light-content' />
+      <SectionList
+        sections={sections}
+        keyExtractor={(item, index) =>
+          item[0]?.id
+            ? `section-${item[0].id}-${index}`
+            : `section-empty-${index}`
+        }
+        stickySectionHeadersEnabled={false}
         ListHeaderComponent={
           <View style={styles.logoContainer}>
             <Image source={LOGO_IMAGE} style={styles.logo} />
@@ -87,52 +119,85 @@ export default function CardListScreen() {
         ListFooterComponent={
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              © 2025 Of Creatures and Realms™. All rights reserved.
+              © 2025 Of Creatures and Realms™.{'\n'}All rights reserved.
             </Text>
           </View>
         }
-        renderItem={({ item }) => {
-          const isAcquired = acquiredCardIds.has(item.id);
-
-          return (
-            <View
-              style={styles.gridItemContainer}
-              onLayout={(e) => handleCardLayout(item.id, e)}
-            >
-              {isAcquired ? (
-                <CardComponent
-                  images={{
-                    base: item.imageUrl,
-                    mask: item.maskUrl,
-                    foil: item.foilUrl,
-                  }}
-                  onPress={() => setSelectedId(item.id)}
+        renderSectionHeader={({ section }) => (
+          <View style={styles.sectionHeaderContainer}>
+            <LinearGradient
+              colors={[
+                'transparent',
+                'rgba(199, 165, 104, 0.25)',
+                'transparent',
+              ]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.divider}
+            />
+            {section.logoUrl && (
+              <>
+                <Image
+                  source={{ uri: section.logoUrl }}
+                  style={styles.sectionHeaderLogo}
                 />
-              ) : (
-                // El placeholder es un View que imita exactamente el tamaño y margen del CardComponent.
-                <View
-                  style={{
-                    width: SCREEN_WIDTH / 3.6,
-                    height: 170,
-                    margin: 8, // El mismo margen que en styles.cardWrapper de Card.tsx
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#1C1C1E', // Un color de fondo sutil
-                    borderRadius: 6, // El mismo radio que en Card.tsx
-                  }}
+                <Pressable
+                  style={styles.infoIconContainer}
+                  onPress={() => handlePresentModalPress(section)}
+                  hitSlop={10}
                 >
                   <Image
-                    source={CARD_BACK_IMAGE}
-                    style={styles.cardBackImage}
+                    source={INFO_ICON_IMAGE}
+                    style={styles.infoIconImage}
                   />
+                </Pressable>
+              </>
+            )}
+          </View>
+        )}
+        renderItem={({ item }) => (
+          <FlatList
+            data={item}
+            renderItem={({ item: cardItem }) => {
+              const isAcquired = acquiredCardIds.has(cardItem.id);
+              return (
+                <View
+                  style={styles.gridItemContainer}
+                  onLayout={(e) => handleCardLayout(cardItem.id, e)}
+                >
+                  {isAcquired ? (
+                    <CardComponent
+                      images={{
+                        base: cardItem.imageUrl,
+                        mask: cardItem.maskUrl,
+                        foil: cardItem.foilUrl,
+                      }}
+                      onPress={() => setSelectedId(cardItem.id)}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        width: CARD_WIDTH,
+                        height: CARD_HEIGHT,
+                        margin: 8,
+                      }}
+                    >
+                      <Image
+                        source={CARD_BACK_IMAGE}
+                        style={styles.cardBackImage}
+                      />
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
-          );
-        }}
+              );
+            }}
+            keyExtractor={(cardItem) => cardItem.id}
+            numColumns={3}
+            scrollEnabled={false}
+          />
+        )}
       />
 
-      {/* La vista animada de la carta seleccionada */}
       {selectedItem && acquiredCardIds.has(selectedItem.id) && (
         <AnimatedSelectedCard
           images={{
@@ -145,6 +210,11 @@ export default function CardListScreen() {
           fromPosition={cardPositions[selectedItem.id]}
         />
       )}
+
+      <ExpansionDetailSheet
+        expansion={selectedExpansion}
+        bottomSheetModalRef={bottomSheetModalRef}
+      />
     </SafeAreaView>
   );
 }
@@ -152,15 +222,44 @@ export default function CardListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
   centered: { justifyContent: 'center', alignItems: 'center' },
-  list: { paddingHorizontal: 10 },
   errorText: {
     color: '#ff6b6b',
     fontSize: 16,
     textAlign: 'center',
     paddingHorizontal: 20,
   },
-  logoContainer: { alignItems: 'center', marginTop: 40, marginBottom: 20 },
+  logoContainer: { alignItems: 'center', marginTop: 40 },
   logo: { width: 150, height: 150, resizeMode: 'contain' },
+  sectionHeaderWrapper: {
+    marginTop: 40,
+    marginBottom: 20,
+  },
+  sectionHeaderContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sectionHeaderLogo: {
+    width: '100%',
+    aspectRatio: 1.833,
+    resizeMode: 'contain',
+  },
+  infoIconContainer: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    padding: 8,
+  },
+  infoIconImage: {
+    width: 28,
+    height: 28,
+    opacity: 1,
+  },
+  divider: {
+    height: 2,
+    width: '90%',
+    alignSelf: 'center',
+  },
   gridItemContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -175,6 +274,7 @@ const styles = StyleSheet.create({
     paddingBottom: 150,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   footerText: {
     marginTop: 60,
