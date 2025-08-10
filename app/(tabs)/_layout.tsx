@@ -121,6 +121,10 @@ const CustomTabBar: React.FC<
       icon: require('../../assets/images/booster.webp'),
       name: 'Open booster',
     },
+    playCanvas: {
+      icon: require('../../assets/images/playroom.webp'),
+      name: 'Playroom',
+    },
     profile: {
       icon: require('../../assets/images/profile.webp'),
       name: 'My profile',
@@ -193,6 +197,7 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name='index' />
       <Tabs.Screen name='openBooster' />
+      <Tabs.Screen name='playCanvas' />
       <Tabs.Screen name='profile' />
     </Tabs>
   );
