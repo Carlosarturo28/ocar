@@ -236,6 +236,17 @@
         "type": "Servants",
         "affinity": "Umbral",
         "probability": 0.5
+      },
+      {
+        "id": "22",
+        "name": "Bloodroot_Jishnik",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755011698/22_-_Bloodroot_Jishnik_sgvdeu.webp",
+        "foilUrl": null,
+        "isHolo": true,
+        "maskUrl": null,
+        "type": "Creature",
+        "affinity": "Bestial",
+        "probability": 0.5
       }
     ]
   }
