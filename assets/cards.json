@@ -5,6 +5,7 @@
     "description": "The first expansion of the game, introducing new realms, creatures, and objects.",
     "releaseYear": 2025,
     "logoUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1754585261/echoes-of-the-first-light_gcbvah.png",
+    "iconUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755093527/eotfl-icon_ya2axr.svg",
     "cards": [
       {
         "id": "01",
@@ -15,7 +16,27 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Umbral",
-        "probability": 0.03
+        "probability": 0.08,
+        "realmCost": 5,
+        "manaCost": 4,
+        "hp": 22,
+        "artist": "AndrewPr0",
+        "flavorText": "A vengeful wraith bound to its own skull, it drifts through shadow, hunting the bloodline that betrayed it.",
+        "passive": "Bound by Bone - Upon death it leaves unit in skull. Pay 2 mana and place Nightbone on skull.",
+        "attacks": [
+          {
+            "name": "Skullash",
+            "description": "Whips its spectral chain through the veil, dealing damage and silencing the target's next ability.",
+            "cost": 3,
+            "damage": 7
+          },
+          {
+            "name": "Echo of Death",
+            "description": "Replays the last attack used against it, but twisted with shadow—halves the original effect and adds fear.",
+            "cost": 1,
+            "damage": null
+          }
+        ]
       },
       {
         "id": "02",
@@ -26,7 +47,14 @@
         "maskUrl": null,
         "type": "Realm",
         "affinity": "Umbral",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": null,
+        "manaBonus": 2,
+        "hp": 13,
+        "artist": "AndrewPr0",
+        "flavorText": "Where the dead sleep beneath, the mist rises and the ancient magic stirs beneath the surface.",
+        "auxiliaryText": "...They say the trees here whisper in dead tongues.",
+        "passive": "Sunken Graves - At the start of each turn, one random creature gains +1 HP but suffers -1 speed."
       },
       {
         "id": "03",
@@ -37,7 +65,15 @@
         "maskUrl": null,
         "type": "Servants",
         "affinity": "Arcane",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": null,
+        "manaBonus": 1,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Pitiful souls, bound by the Archmage’s spellwork. They no longer recall their lives—only their duty.",
+        "auxiliaryText": "Give them a job, and they’ll do it. Eventually.",
+        "passive": "Residual Spark - If serving an Arcane Realm, roll a d6 at the start of your turn. On a 6, gain 1 extra mana."
       },
       {
         "id": "04",
@@ -48,7 +84,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Verdant",
-        "probability": 0.8
+        "probability": 0.8,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "This sprig was plucked from the First Tree, deep within the Verdant Veil, where time flows sideways and roots whisper ancient secrets of growth and rebirth.",
+        "auxiliaryText": "No fire, frost, or shadow has yet stilled its quiet growth.",
+        "passive": "Rootbound Blessing - Once per turn, when a Verdant creature is active, gain 1 extra mana or heal 1 point of your Realm’s health — your choice."
       },
       {
         "id": "05",
@@ -59,7 +102,21 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Bestial",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": 3,
+        "manaCost": 2,
+        "hp": 13,
+        "artist": "AndrewPr0",
+        "flavorText": "Born from molten soil, it charges with the fury of the flame. Its breath smells of ash and battle.",
+        "passive": "Volcanic Surge - Whenever this creature takes damage, roll a d4. On a 4, deal 1 damage to the attacking creature.",
+        "attacks": [
+          {
+            "name": "Blazing Bite",
+            "description": "The target gets burning. If the target is already burning, deal +1 additional damage.",
+            "cost": 1,
+            "damage": 2
+          }
+        ]
       },
       {
         "id": "06",
@@ -70,7 +127,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Verdant",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Tears of a phoenix born in lightning, these golden drops fall from the sky when storms strike lonely peaks.",
+        "auxiliaryText": "The phoenix’s cry stirs the storm, and its tears answer.",
+        "passive": "Stormbound Link - When played, restore 3 mana to your active creature. If the Storm Phoenix is active, it also gains +2 attack on its next turn."
       },
       {
         "id": "07",
@@ -81,7 +145,21 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Verdant",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": 4,
+        "manaCost": 3,
+        "hp": 16,
+        "artist": "AndrewPr0",
+        "flavorText": "High above the clouds, its scream echoes like thunder across the heavens. Wherever the Storm Phoenix soars, tempests rise—and its golden tears fall like omens.",
+        "passive": "Crybind - Flying. If Tears of the Storm Phoenix is active, this creature's main attack costs 1 less mana.",
+        "attacks": [
+          {
+            "name": "Cry of the Tempest",
+            "description": "The phoenix lets out a thunderous cry, calling the storm. Target loses 1 mana on its next turn.",
+            "cost": 3,
+            "damage": 5
+          }
+        ]
       },
       {
         "id": "08",
@@ -92,7 +170,15 @@
         "maskUrl": null,
         "type": "Realm",
         "affinity": "Arcane",
-        "probability": 0.4
+        "probability": 0.4,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 3,
+        "hp": 16,
+        "artist": "AndrewPr0",
+        "flavorText": "An ancient tower that spirals beyond the clouds, its halls echo with whispers of forbidden incantations.",
+        "auxiliaryText": "Even in defeat, the arcane reclaims what is lost.",
+        "passive": "Mana Reflux - When one of your creatures is defeated, your Realm recovers mana equal to half (rounded up) of the damage dealt by the attack that destroyed it."
       },
       {
         "id": "09",
@@ -103,7 +189,27 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Arcane",
-        "probability": 0.3
+        "probability": 0.3,
+        "realmCost": 5,
+        "manaCost": 3,
+        "hp": 19,
+        "artist": "AndrewPr0",
+        "flavorText": "It does not remember its name, only the weight of secrets never meant to be known.",
+        "passive": "Mind Severance - When defeated, randomly select 1 card from your opponent’s hand and discard it.",
+        "attacks": [
+          {
+            "name": "Mnemonic Rift",
+            "description": "If the enemy has Umbral affinity, discard 1 card from your hand and place it at the bottom of your deck.",
+            "cost": 3,
+            "damage": 6
+          },
+          {
+            "name": "Scribe of the Forbidden",
+            "description": "Draw 1 card. If it's an Arcane affinity object, deal +2 additional damage on your next turn.",
+            "cost": 1,
+            "damage": null
+          }
+        ]
       },
       {
         "id": "10",
@@ -114,7 +220,15 @@
         "maskUrl": null,
         "type": "Realm",
         "affinity": "Verdant",
-        "probability": 0.4
+        "probability": 0.4,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 1,
+        "hp": 15,
+        "artist": "AndrewPr0",
+        "flavorText": "Where beauty entangles with peril, and the forest remembers every wound. The roots whisper old grudges, and every bloom hides a thorn.",
+        "auxiliaryText": "The forest forgets none, and shelters those it remembers...",
+        "passive": "Verdant Resurgence - When your creature is defeated, roll a d6. On 4+, return it to the field with half of its original Health (rounded up)."
       },
       {
         "id": "11",
@@ -125,7 +239,15 @@
         "maskUrl": null,
         "type": "Servants",
         "affinity": "Bestial",
-        "probability": 0.6
+        "probability": 0.6,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 1,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "No one knows what cursed stew birthed the Bonebellies, but wherever they waddle, chaos follows. They’re not evil—just curious, distracted, and impossible to control.",
+        "auxiliaryText": "They don’t bite… unless they’re hungry. Which is always.",
+        "passive": "Pack Frenzy - Your active creature gains +1 Attack for each Bestial affinity card on the field (yours or your opponent's)"
       },
       {
         "id": "12",
@@ -136,7 +258,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Bestial",
-        "probability": 0.8
+        "probability": 0.8,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Forged in instinct, the totem echoes the voice of the pack—calling every claw and fang to rise in unison.",
+        "auxiliaryText": "It howls when no one else dares.",
+        "passive": "Totemic Guard - Your creature takes 1 less damage from attacks. If it has Bestial affinity, it also gains +1 Attack on the next turn."
       },
       {
         "id": "13",
@@ -147,7 +276,15 @@
         "maskUrl": null,
         "type": "Realm",
         "affinity": "Bestial",
-        "probability": 0.2
+        "probability": 0.2,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 2,
+        "hp": 14,
+        "artist": "AndrewPr0",
+        "flavorText": "No walls, no words — only claw and howl. Here, survival is worship, and beasts rule by tooth and terror. To live here is to fight. To die here is to feed the next.",
+        "auxiliaryText": "The wild does not mourn.",
+        "passive": "Primal Instinct - If your creature survives 3 turns, roll a d6. On a perfect, it fully heals. If it has Bestial affinity, its next attack deals x2 damage."
       },
       {
         "id": "14",
@@ -158,7 +295,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Arcane",
-        "probability": 0.3
+        "probability": 0.3,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Forged in a forgotten aeon, the Chronolens peers through fractured timelines to glimpse futures that never were—then folds one into reality.",
+        "auxiliaryText": "Its visions can twist the path of destiny.",
+        "passive": "Mind Pierce - Discard a random card from your opponent’s hand. If it’s an object, draw 1 card. If your creature is arcane, its attack cost 1 less mana."
       },
       {
         "id": "15",
@@ -169,7 +313,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Umbral",
-        "probability": 0.4
+        "probability": 0.4,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Stitched from memories erased, it clings to no name or scent. Those who vanish beneath it aren’t hunted—because none remember to hunt them.",
+        "auxiliaryText": "Those who wear it are not hidden — they are forgotten.",
+        "passive": "Forgotten Veil - When your creature is attacked, roll a d20. On a 14+, the attack misses. If your creature has Umbral affinity, the attack misses on a 10+."
       },
       {
         "id": "16",
@@ -180,7 +331,15 @@
         "maskUrl": null,
         "type": "Servants",
         "affinity": "Verdant",
-        "probability": 0.5
+        "probability": 0.5,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 2,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Soft-bodied and silent, these fungal grubs chew through rot and root alike—fertilizing the forest in quiet, tireless, almost reverent devotion.",
+        "auxiliaryText": "Tiny devotees of decay, roots, and rebirth.",
+        "passive": "Fungal Resurgence - If your Realm has half health or less, roll two d8. Restore health equal to the highest roll."
       },
       {
         "id": "17",
@@ -191,7 +350,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Umbral",
-        "probability": 0.3
+        "probability": 0.3,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Lit with no flame and casting no warmth, it shows paths not yet walked—and those long buried.",
+        "auxiliaryText": "Its glow attracts more than it reveals.",
+        "passive": "Echo of the Unseen - When played, look at the top 5 cards of your deck. Choose 2 to keep; place the rest at the bottom of your deck in any order."
       },
       {
         "id": "18",
@@ -202,7 +368,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Bestial",
-        "probability": 0.4
+        "probability": 0.4,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "In barren lands, this blood appears only to dying beasts—offering cruel hope in their final breath.",
+        "auxiliaryText": "A mirage to most. Salvation to one.",
+        "passive": "Fang's Gamble - You may roll a d8 up to 3 times. Restore health equal to your final roll. If the creature has Bestial Affinity, add +3 to the final result."
       },
       {
         "id": "19",
@@ -213,7 +386,14 @@
         "maskUrl": null,
         "type": "Object",
         "affinity": "Arcane",
-        "probability": 0.7
+        "probability": 0.7,
+        "realmCost": null,
+        "manaCost": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "All that remains of the sacred orb shattered during the Great End—its last light still fiercely protective.",
+        "auxiliaryText": "Still warm to the touch, after all these years.",
+        "passive": "Mirror Pulse - If your active creature is Arcane, it takes no extra damage from Umbral affinity. For the next 2 turns, all your attacks cost only 1 mana."
       },
       {
         "id": "20",
@@ -224,7 +404,27 @@
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Arcane",
-        "probability": 0.2
+        "probability": 0.2,
+        "realmCost": 3,
+        "manaCost": 2,
+        "hp": 15,
+        "artist": "AndrewPr0",
+        "flavorText": "Mis Varmauth smells what others hide. Its eye-portals see no light, only the fractures between truths.",
+        "passive": "Scent of Secrets - While active, each time your opponent draws a card from their deck, they must reveal it to you.",
+        "attacks": [
+          {
+            "name": "Fracture Glare",
+            "description": "Opens an eye-portal to unleash spatial distortion. Blind the enemy for 1 turn on a d8 roll of 6+.",
+            "cost": 2,
+            "damage": 4
+          },
+          {
+            "name": "Realm Reversal",
+            "description": "If your Realm has less than half its health, roll a d12. If even, steal 3 mana from the enemy Realm and add it to yours.",
+            "cost": 1,
+            "damage": null
+          }
+        ]
       },
       {
         "id": "21",
@@ -235,18 +435,77 @@
         "maskUrl": null,
         "type": "Servants",
         "affinity": "Umbral",
-        "probability": 0.5
+        "probability": 0.5,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": 1,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Bumbling out of crypt cracks, Skullies wander in packs—forgotten souls with cracked heads, childlike mischief, and an odd sense of purpose.",
+        "auxiliaryText": "Not smart. Not quiet. Not harmless.",
+        "passive": "Rattle Chorus - At the start of your turn, roll a d6. On a 4 or higher, gain 1 mana. If your active creature is Umbral, gain 2 instead."
       },
       {
         "id": "22",
         "name": "Bloodroot_Jishnik",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755011698/22_-_Bloodroot_Jishnik_sgvdeu.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755100509/22_-_Bloodroot_Jishnik_q6g1ln.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
         "type": "Creature",
         "affinity": "Bestial",
-        "probability": 0.5
+        "probability": 0.5,
+        "realmCost": 5,
+        "manaCost": 4,
+        "hp": 17,
+        "artist": "AndrewPr0",
+        "flavorText": "Its tentacles taste the air for heartbeats, dragging prey into the dark before they know they’ve been found.",
+        "passive": "Tangle Trap - Upon death, its roots keep writhing. Pay 2 mana next turn to entangle an enemy, paralizing movement for one turn.",
+        "attacks": [
+          {
+            "name": "Pulse Reaper",
+            "description": "Its tentacles seize the living, delivering them screaming into the fangs that never release",
+            "cost": 3,
+            "damage": 7
+          },
+          {
+            "name": "Rootfang Lash",
+            "description": "Roll a d12: on 5+, the target bleeds, losing -2 HP each turn. If the target is Verdant, the bleeding is automatic.",
+            "cost": 1,
+            "damage": null
+          }
+        ]
+      },
+      {
+        "id": "23",
+        "name": "Thorncoil_Detonator",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755100514/23_-_Thorncoil_Detonator_p19bxy.webp",
+        "foilUrl": null,
+        "isHolo": true,
+        "maskUrl": null,
+        "type": "Creature",
+        "affinity": "Verdant",
+        "probability": 0.3,
+        "realmCost": 3,
+        "manaCost": 4,
+        "hp": 2,
+        "artist": "AndrewPr0",
+        "flavorText": "A living Verdant warhead, its spiked shell hides the volatile heart of the living mother nature.",
+        "passive": "Deathbloom Burst - If destroyed by an enemy, deal instant 13 damage to that enemy.",
+        "attacks": [
+          {
+            "name": "Verdant Implosion",
+            "description": "Sacrifice this creature exploiting itself. Deal damage equal to its remaining HP x2 to the enemy.",
+            "cost": null,
+            "damage": null
+          },
+          {
+            "name": "Thorned Resurgence",
+            "description": "This creature channels its Verdant energy to reinforce itself. Restore +1 HP to this creature (can exceed starting HP).",
+            "cost": null,
+            "damage": null
+          }
+        ]
       }
     ]
   }
