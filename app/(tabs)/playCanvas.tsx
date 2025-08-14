@@ -6,19 +6,19 @@ export default function PlayCanvas() {
   const [loading, setLoading] = useState(true);
 
   const injectedJS = `
-  (function() {
-    let meta = document.querySelector('meta[name=viewport]');
-    if (meta) {
-      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
-    } else {
-      meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
-      document.head.appendChild(meta);
-    }
-  })();
-  true;
-`;
+    (function() {
+      let meta = document.querySelector('meta[name=viewport]');
+      if (meta) {
+        meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+      } else {
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+        document.head.appendChild(meta);
+      }
+    })();
+    true;
+  `;
 
   return (
     <View style={styles.container}>
@@ -28,10 +28,11 @@ export default function PlayCanvas() {
         </View>
       )}
       <WebView
+        style={styles.webview}
         source={{ uri: 'https://www.ofcreaturesandrealms.com/playroom' }}
         injectedJavaScript={injectedJS}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
+        javaScriptEnabled
+        domStorageEnabled
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
       />
