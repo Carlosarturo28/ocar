@@ -51,6 +51,7 @@
         "probability": 0.6,
         "realmCost": null,
         "manaBonus": 2,
+        "manaCost": null,
         "hp": 13,
         "artist": "AndrewPr0",
         "flavorText": "Where the dead sleep beneath, the mist rises and the ancient magic stirs beneath the surface.",
