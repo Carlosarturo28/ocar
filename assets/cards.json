@@ -511,13 +511,13 @@
           {
             "name": "Verdant Implosion",
             "description": "Sacrifice this creature exploiting itself. Deal damage equal to its remaining HP x2 to the enemy.",
-            "cost": null,
+            "cost": 2,
             "damage": null
           },
           {
             "name": "Thorned Resurgence",
             "description": "This creature channels its Verdant energy to reinforce itself. Restore +1 HP to this creature (can exceed starting HP).",
-            "cost": null,
+            "cost": 1,
             "damage": null
           }
         ]
