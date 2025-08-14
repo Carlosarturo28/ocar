@@ -9,8 +9,8 @@
     "cards": [
       {
         "id": "01",
-        "name": "Nightbone_the_scullbound_shade",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/01_-_Nightbone_the_scullbound_shade_xys4si.webp",
+        "name": "Nightbone_the_skullbound_shade",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147055/01_-_Nightbone_the_skullbound_shade_jsekao.webp",
         "foilUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753847492/1_ztpyfp.png",
         "isHolo": true,
         "maskUrl": null,
@@ -42,7 +42,7 @@
       {
         "id": "02",
         "name": "The_drowned_vale",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/02_-_The_drowned_vale_e883vt.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147091/02_-_The_drowned_vale_vceoeq.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
@@ -60,7 +60,7 @@
       {
         "id": "03",
         "name": "Miscastlings",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992016/03_-_Miscastlings_dsev0s.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147128/03_-_Miscastlings_kv3deh.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
@@ -79,7 +79,7 @@
       {
         "id": "04",
         "name": "Sprig_of_Endless_Growth",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/04_-_Sprig_of_Endless_Growth_alh2b2.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147166/04_-_Sprig_of_Endless_Growth_tb0wfm.webp",
         "foilUrl": null,
         "isHolo": false,
         "maskUrl": null,
@@ -98,7 +98,7 @@
       {
         "id": "05",
         "name": "Scorchback_Tusker",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/05_-_Scorchback_Tusker_usesps.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147204/05_-_Scorchback_Tusker_tlp3yf.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
@@ -124,7 +124,7 @@
       {
         "id": "06",
         "name": "Tears_of_the_Storm_Phoenix",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/06_-_Tears_of_the_Storm_Phoenix_cco8up.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147236/06_-_Tears_of_the_Storm_Phoenix_znczrh.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
@@ -143,7 +143,7 @@
       {
         "id": "07",
         "name": "Storm_Phoenix",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992015/07_-_Storm_Phoenix_dje4fq.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147236/06_-_Tears_of_the_Storm_Phoenix_znczrh.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
@@ -169,7 +169,7 @@
       {
         "id": "08",
         "name": "The_Vera_Spire",
-        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1753992016/08_-_The_Vera_Spire_hwqot9.webp",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755147306/08_-_The_Vera_Spire_ygns1n.webp",
         "foilUrl": null,
         "isHolo": true,
         "maskUrl": null,
