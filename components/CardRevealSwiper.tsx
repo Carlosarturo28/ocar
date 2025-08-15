@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   instructions: {
     position: 'absolute',
-    bottom: '11%',
+    bottom: '10%',
     width: '100%',
     textAlign: 'center',
     color: '#fff',
