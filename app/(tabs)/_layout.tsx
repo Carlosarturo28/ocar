@@ -133,7 +133,7 @@ const CustomTabBar: React.FC<
 
   return (
     <View
-      style={[styles.customTabBarContainer, { paddingBottom: insets.bottom }]}
+      style={styles.customTabBarContainer}
     >
       <ImageBackground source={BACKGROUND_IMAGE} style={styles.tabBarBg}>
         <View style={styles.tabBarContent}>
@@ -211,12 +211,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 110,
+    height: 130,
     backgroundColor: 'transparent',
   },
   tabBarBg: {
     flex: 1,
-    height: 110,
+    height: 130,
   },
   tabBarContent: {
     flex: 1,
