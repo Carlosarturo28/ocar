@@ -4,12 +4,10 @@ import React from 'react';
 import {
   Image,
   View,
-  Text,
   StyleSheet,
   ImageSourcePropType,
   ImageBackground,
   TouchableWithoutFeedback,
-  Platform,
 } from 'react-native';
 import { Tabs } from 'expo-router';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -20,6 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useFonts, Cinzel_700Bold } from '@expo-google-fonts/cinzel';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {
   activeText: '#E0B64B',
@@ -111,6 +110,7 @@ const CustomTabBar: React.FC<
     },
     [state.index]
   );
+  const insets = useSafeAreaInsets();
 
   const tabConfig = {
     index: {
@@ -132,7 +132,9 @@ const CustomTabBar: React.FC<
   };
 
   return (
-    <View style={styles.customTabBarContainer}>
+    <View
+      style={[styles.customTabBarContainer, { paddingBottom: insets.bottom }]}
+    >
       <ImageBackground source={BACKGROUND_IMAGE} style={styles.tabBarBg}>
         <View style={styles.tabBarContent}>
           {state.routes.map((route, index) => {
@@ -209,11 +211,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 100,
+    height: 110,
     backgroundColor: 'transparent',
   },
   tabBarBg: {
     flex: 1,
+    height: 110,
   },
   tabBarContent: {
     flex: 1,

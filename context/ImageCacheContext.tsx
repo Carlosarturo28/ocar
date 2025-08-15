@@ -1,5 +1,4 @@
 // src/context/ImageCacheContext.tsx
-
 import React, {
   createContext,
   useContext,
@@ -9,40 +8,22 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import { Skia, SkImage, useImage } from '@shopify/react-native-skia';
+import { Skia, SkImage } from '@shopify/react-native-skia';
+import {
+  loadCachedData,
+  saveCachedData,
+  saveImageLocally,
+  deleteLocalImage,
+  compareExpansions,
+  extractAllUrls,
+  Expansion,
+} from '@/utils/imageCache.utils';
 
 const CARDS_API_URL =
   'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json';
 
-interface Card {
-  id: string;
-  name: string;
-  imageUrl: string;
-  foilUrl: string | null;
-  isHolo: boolean;
-  maskUrl: string | null;
-  type: string;
-  affinity: string;
-  probability: number;
-}
-
-interface Expansion {
-  id: number;
-  name: string;
-  description: string;
-  releaseYear: number;
-  logoUrl: string;
-  cards: Card[];
-}
-// --- END OF TYPE DEFINITIONS ---
-
-// Configuración de optimización
-const BATCH_SIZE = 5;
-const RETRY_ATTEMPTS = 2;
-const CACHE_TIMEOUT = 30000;
-
 interface ImageCache {
-  [key: string]: SkImage | null;
+  [remoteUrl: string]: SkImage | null;
 }
 
 interface LoadingProgress {
@@ -56,9 +37,9 @@ interface ImageCacheContextType {
   imageCache: ImageCache;
   isLoading: boolean;
   loadingProgress: LoadingProgress;
-  getImage: (uri: string) => SkImage | null;
-  preloadImage: (uri: string) => Promise<SkImage | null>;
-  clearCache: () => void;
+  loadingMessage: string; // <-- nuevo
+  getImage: (remoteUrl: string) => SkImage | null;
+  clearCache: () => Promise<void>;
   cacheSize: number;
 }
 
@@ -75,333 +56,164 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
     currentBatch: 0,
     totalBatches: 0,
   });
+  const [loadingMessage, setLoadingMessage] = useState('Booting up...');
 
-  const loadImageWithRetry = useCallback(
-    async (
-      url: string,
-      attempts: number = RETRY_ATTEMPTS
-    ): Promise<SkImage | null> => {
-      for (let i = 0; i < attempts; i++) {
+  const buildSkiaCache = useCallback(
+    async (imagesMap: Record<string, string>) => {
+      const newCache: ImageCache = {};
+
+      for (const [remoteUrl, localPath] of Object.entries(imagesMap)) {
         try {
-          const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout')), CACHE_TIMEOUT)
-          );
-
-          const loadPromise = (async () => {
-            const data = await Skia.Data.fromURI(url);
-            return Skia.Image.MakeImageFromEncoded(data);
-          })();
-
-          const image = await Promise.race([loadPromise, timeoutPromise]);
-
-          if (image) {
-            return image;
+          const data = await Skia.Data.fromURI(localPath); // <- aquí el await
+          if (!data) {
+            newCache[remoteUrl] = null;
+            continue;
           }
-        } catch (error) {
-          console.warn(
-            `⚠️ Intento ${i + 1}/${attempts} falló para ${url}:`,
-            error
-          );
-          if (i === attempts - 1) {
-            console.error(`❌ Error final al cargar imagen: ${url}`, error);
-          }
-          if (i < attempts - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
+          const img = Skia.Image.MakeImageFromEncoded(data);
+          newCache[remoteUrl] = img;
+        } catch (err) {
+          console.error(`Error creating SkImage for ${remoteUrl}`, err);
+          newCache[remoteUrl] = null;
         }
       }
-      return null;
+
+      setImageCache(newCache);
     },
     []
   );
 
-  const loadImagesInBatches = useCallback(
-    async (urls: string[]) => {
-      if (urls.length === 0) {
-        return [];
-      }
-
-      const batches = [];
-      for (let i = 0; i < urls.length; i += BATCH_SIZE) {
-        batches.push(urls.slice(i, i + BATCH_SIZE));
-      }
-
-      setLoadingProgress((prev) => ({
-        ...prev,
-        total: urls.length,
-        totalBatches: batches.length,
-      }));
-
-      const allResults: Array<{ url: string; image: SkImage | null }> = [];
-
-      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-        const batch = batches[batchIndex];
-
-        setLoadingProgress((prev) => ({
-          ...prev,
-          currentBatch: batchIndex + 1,
-        }));
-
-        try {
-          const batchResults = await Promise.all(
-            batch.map(async (url) => {
-              const image = await loadImageWithRetry(url);
-
-              setLoadingProgress((prev) => ({
-                ...prev,
-                loaded: prev.loaded + 1,
-              }));
-
-              setImageCache((prevCache) => ({
-                ...prevCache,
-                [url]: image,
-              }));
-
-              return { url, image };
-            })
-          );
-
-          allResults.push(...batchResults);
-        } catch (error) {
-          console.error(`❌ Error en lote ${batchIndex + 1}:`, error);
-        }
-
-        if (batchIndex < batches.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      }
-      return allResults;
-    },
-    [loadImageWithRetry]
-  );
-
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
 
-    const loadAndCacheImages = async () => {
+    async function initCache() {
       try {
-        const response = await fetch(CARDS_API_URL);
+        const { expansions: oldExpansions, imagesMap: oldMap } =
+          await loadCachedData();
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const res = await fetch(CARDS_API_URL);
+        const newExpansions: Expansion[] = await res.json();
 
-        const expansionData: Expansion[] = await response.json();
+        if (!oldExpansions) {
+          setLoadingMessage('Gathering all creatures and relics...');
+          const urls = extractAllUrls(newExpansions);
 
-        if (!isMounted) {
-          return;
-        }
+          setLoadingProgress({
+            loaded: 0,
+            total: urls.length,
+            currentBatch: 1,
+            totalBatches: 1,
+          });
 
-        if (!Array.isArray(expansionData)) {
-          throw new Error('La respuesta no es un array válido de expansiones');
-        }
-
-        const imageUrls = Array.from(
-          new Set(
-            expansionData
-              .flatMap((expansion) => expansion.cards || [])
-              .flatMap((card) => [card.imageUrl, card.maskUrl, card.foilUrl])
-              .filter(
-                (url): url is string =>
-                  url != null &&
-                  typeof url === 'string' &&
-                  (url.startsWith('http://') || url.startsWith('https://'))
-              )
-          )
-        );
-
-        if (imageUrls.length === 0) {
-          if (isMounted) {
-            setIsLoading(false);
+          const newMap: Record<string, string> = {};
+          for (let i = 0; i < urls.length; i++) {
+            setLoadingMessage(
+              `Calling forth creature ${i + 1} of ${urls.length}`
+            );
+            const localPath = await saveImageLocally(urls[i]);
+            newMap[urls[i]] = localPath;
+            setLoadingProgress((p) => ({ ...p, loaded: i + 1 }));
           }
-          return;
+
+          setLoadingMessage('Sealing the archives in the Royal Library...');
+          await saveCachedData(newExpansions, newMap);
+
+          if (mounted) {
+            setLoadingMessage('Imbuing magic into the scrolls...');
+            await buildSkiaCache(newMap);
+          }
+        } else {
+          const { added, removed } = compareExpansions(
+            newExpansions,
+            oldExpansions
+          );
+          const updatedMap = { ...oldMap };
+
+          if (added.length > 0) {
+            setLoadingMessage(`Summoning ${added.length} new allies...`);
+            setLoadingProgress({
+              loaded: 0,
+              total: added.length,
+              currentBatch: 1,
+              totalBatches: 1,
+            });
+
+            for (let i = 0; i < added.length; i++) {
+              setLoadingMessage(
+                `Calling forth creature ${i + 1} of ${added.length}`
+              );
+              updatedMap[added[i]] = await saveImageLocally(added[i]);
+              setLoadingProgress((p) => ({ ...p, loaded: i + 1 }));
+            }
+          }
+
+          if (removed.length > 0) {
+            setLoadingMessage(
+              `Banishment of ${removed.length} forsaken cards...`
+            );
+            for (const url of removed) {
+              if (updatedMap[url]) {
+                await deleteLocalImage(updatedMap[url]);
+                delete updatedMap[url];
+              }
+            }
+          }
+
+          setLoadingMessage('Sealing the archives in the Royal Library...');
+          await saveCachedData(newExpansions, updatedMap);
+
+          if (mounted) {
+            setLoadingMessage('Imbuing magic into the scrolls...');
+            await buildSkiaCache(updatedMap);
+          }
         }
-
-        await loadImagesInBatches(imageUrls);
-      } catch (error) {
-        console.error('❌ Error en loadAndCacheImages:', error);
+      } catch (err) {
+        console.error('Error initializing image cache:', err);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
+    }
 
-      if (isMounted) {
-        setIsLoading(false);
-      }
-    };
-
-    setTimeout(() => {
-      if (isMounted) {
-        loadAndCacheImages();
-      }
-    }, 100);
-
+    initCache();
     return () => {
-      isMounted = false;
+      mounted = false;
     };
-  }, [loadImagesInBatches]);
-
-  const preloadImage = useCallback(
-    async (uri: string): Promise<SkImage | null> => {
-      if (imageCache[uri]) {
-        return imageCache[uri];
-      }
-
-      const image = await loadImageWithRetry(uri);
-
-      setImageCache((prevCache) => ({
-        ...prevCache,
-        [uri]: image,
-      }));
-
-      return image;
-    },
-    [imageCache, loadImageWithRetry]
-  );
-
-  const clearCache = useCallback(() => {
-    setImageCache({});
-    setLoadingProgress({
-      loaded: 0,
-      total: 0,
-      currentBatch: 0,
-      totalBatches: 0,
-    });
-  }, []);
+  }, [buildSkiaCache]);
 
   const getImage = useCallback(
-    (uri: string): SkImage | null => {
-      return imageCache[uri] || null;
-    },
+    (remoteUrl: string) => imageCache[remoteUrl] || null,
     [imageCache]
   );
 
-  const cacheSize = useMemo(() => {
-    return Object.keys(imageCache).length;
-  }, [imageCache]);
+  const clearCache = useCallback(async () => {
+    setImageCache({});
+    await saveCachedData([], {}); // limpia AsyncStorage
+  }, []);
 
-  const contextValue: ImageCacheContextType = useMemo(
+  const cacheSize = useMemo(() => Object.keys(imageCache).length, [imageCache]);
+
+  const value: ImageCacheContextType = useMemo(
     () => ({
       imageCache,
       isLoading,
       loadingProgress,
       getImage,
-      preloadImage,
+      loadingMessage,
       clearCache,
       cacheSize,
     }),
-    [
-      imageCache,
-      isLoading,
-      loadingProgress,
-      getImage,
-      preloadImage,
-      clearCache,
-      cacheSize,
-    ]
+    [imageCache, isLoading, loadingProgress, getImage, clearCache, cacheSize]
   );
 
   return (
-    <ImageCacheContext.Provider value={contextValue}>
+    <ImageCacheContext.Provider value={value}>
       {children}
     </ImageCacheContext.Provider>
   );
 };
 
 export const useImageCache = () => {
-  const context = useContext(ImageCacheContext);
-  if (context === undefined) {
-    throw new Error('useImageCache must be used within an ImageCacheProvider');
-  }
-  return context;
-};
-
-export const useImageCacheProgress = () => {
-  const { loadingProgress, isLoading } = useImageCache();
-
-  const progressPercentage = useMemo(() => {
-    if (loadingProgress.total === 0) return 0;
-    return Math.round((loadingProgress.loaded / loadingProgress.total) * 100);
-  }, [loadingProgress.loaded, loadingProgress.total]);
-
-  return {
-    ...loadingProgress,
-    progressPercentage,
-    isLoading,
-  };
-};
-
-export const useLocalImage = (asset: any): SkImage | null => {
-  return useImage(asset);
-};
-
-export const useLocalImageFromPath = (assetPath: string) => {
-  const [image, setImage] = useState<SkImage | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadImage = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        let resolvedUri: string;
-
-        if (assetPath.startsWith('http') || assetPath.startsWith('file://')) {
-          resolvedUri = assetPath;
-        } else {
-          throw new Error(
-            'Use require() instead of string paths for local assets'
-          );
-        }
-
-        const data = await Skia.Data.fromURI(resolvedUri);
-        const skImage = Skia.Image.MakeImageFromEncoded(data);
-
-        if (isMounted) {
-          setImage(skImage);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('Error loading local image:', err);
-        if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unknown error');
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadImage();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [assetPath]);
-
-  return { image, isLoading, error };
-};
-
-export const usePreloadLocalAssets = () => {
-  const { preloadImage } = useImageCache();
-
-  const preloadLocalAsset = useCallback(
-    async (asset: any) => {
-      try {
-        const { resolveAssetSource } = require('react-native');
-        const resolvedAsset = resolveAssetSource(asset);
-
-        if (resolvedAsset?.uri) {
-          return await preloadImage(resolvedAsset.uri);
-        }
-
-        return null;
-      } catch (error) {
-        console.error('Error preloading local asset:', error);
-        return null;
-      }
-    },
-    [preloadImage]
-  );
-
-  return { preloadLocalAsset };
+  const ctx = useContext(ImageCacheContext);
+  if (!ctx)
+    throw new Error('useImageCache must be used within ImageCacheProvider');
+  return ctx;
 };

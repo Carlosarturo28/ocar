@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   interpolate,
   runOnJS,
+  withDelay,
 } from 'react-native-reanimated';
 import { GestureContainer } from './card/GestureContainer';
 import { ImageCanvas } from './card/ImageCanvas';
@@ -21,6 +22,7 @@ export interface CardAssets {
 // ✅ 1. AÑADIMOS PROPS OPCIONALES PARA EL TAMAÑO
 interface CardProps {
   images: CardAssets;
+  index: number;
   onPress: () => void;
   width?: number; // Ancho opcional
   height?: number; // Alto opcional
@@ -29,6 +31,7 @@ interface CardProps {
 export function Card({
   images,
   onPress,
+  index,
   width,
   height,
 }: CardProps): React.JSX.Element {
@@ -47,22 +50,30 @@ export function Card({
   }, []);
 
   const animatedContainerStyle = useAnimatedStyle(() => {
-    const rotateY = interpolate(mountProgress.value, [0, 1], [-90, 0]);
-    const opacity = interpolate(mountProgress.value, [0, 0.5], [0, 1]);
-    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]);
+    const rotateY = interpolate(mountProgress.value, [0, 1], [-90, 0]); // flip
+    const opacity = mountProgress.value; // fade suave
+    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]); // escala
 
     return {
-      // Usamos las dimensiones calculadas (grandes o pequeñas)
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       opacity,
       transform: [
-        { perspective: 1000 },
+        { perspective: 1000 }, // para que el flip se vea 3D
         { rotateY: `${rotateY}deg` },
         { scale },
       ],
     };
   });
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      mountProgress.value = withDelay(
+        index * 50,
+        withTiming(1, { duration: 500 })
+      );
+    });
+  }, []);
 
   const animatedWidth = useSharedValue(CARD_WIDTH);
   const animatedHeight = useSharedValue(CARD_HEIGHT);

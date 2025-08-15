@@ -69,7 +69,11 @@ function RootLayoutNav() {
 function AppContent() {
   const colorScheme = useColorScheme();
 
-  const { isLoading: areImagesLoading } = useImageCache();
+  const {
+    isLoading: areImagesLoading,
+    loadingMessage,
+    loadingProgress,
+  } = useImageCache();
 
   if (areImagesLoading) {
     return (
@@ -90,7 +94,10 @@ function AppContent() {
             fontFamily: 'Cinzel_700Bold',
           }}
         >
-          Loading resources...
+          {loadingMessage}
+        </Text>
+        <Text style={{ color: '#aaa', marginTop: 5 }}>
+          {loadingProgress.loaded} / {loadingProgress.total}
         </Text>
       </View>
     );

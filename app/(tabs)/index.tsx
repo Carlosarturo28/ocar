@@ -158,7 +158,7 @@ export default function CardListScreen() {
         renderItem={({ item }) => (
           <FlatList
             data={item}
-            renderItem={({ item: cardItem }) => {
+            renderItem={({ item: cardItem, index }) => {
               const isAcquired = acquiredCardIds.has(cardItem.id);
               return (
                 <View
@@ -167,6 +167,7 @@ export default function CardListScreen() {
                 >
                   {isAcquired ? (
                     <CardComponent
+                      index={index}
                       images={{
                         base: cardItem.imageUrl,
                         mask: cardItem.maskUrl,
