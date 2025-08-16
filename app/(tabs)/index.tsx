@@ -155,15 +155,10 @@ export default function CardListScreen() {
         stickySectionHeadersEnabled={false}
         removeClippedSubviews={true}
         // ✅ Optimizaciones compensatorias para mantener performance
-        maxToRenderPerBatch={29}
-        initialNumToRender={20}
-        windowSize={20}
+initialNumToRender={50}
+windowSize={50}
+maxToRenderPerBatch={50}
         legacyImplementation={false}
-        getItemLayout={(data, index) => ({
-          length: ROW_HEIGHT,
-          offset: ROW_HEIGHT * index,
-          index,
-        })}
         ListHeaderComponent={
           <View style={styles.logoContainer}>
             <Image source={LOGO_IMAGE} style={styles.logo} />
@@ -219,15 +214,15 @@ export default function CardListScreen() {
                   onLayout={(e) => handleCardLayout(cardItem.id, e)}
                 >
                   {isAcquired ? (
-                    <CardComponent
-                      index={index}
-                      images={{
-                        base: cardItem.imageUrl,
-                        mask: cardItem.maskUrl,
-                        foil: cardItem.foilUrl,
-                      }}
-                      onPress={() => setSelectedId(cardItem.id)}
-                    />
+                    <Pressable style={[
+                        styles.cardBackContainer,
+                        {
+                          width: CARD_WIDTH,
+                          height: CARD_HEIGHT,
+                        },
+                      ]} onPress={() => setSelectedId(cardItem.id)}>
+                    <Image source={cardItem.imageUrl} styles={styles.cardBackImage} />
+                    </Pressable>
                   ) : (
                     <View
                       style={[
