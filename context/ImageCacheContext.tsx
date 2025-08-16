@@ -1,4 +1,3 @@
-// src/context/ImageCacheContext.tsx
 import React, {
   createContext,
   useContext,
@@ -17,6 +16,7 @@ import {
   compareExpansions,
   extractAllUrls,
   Expansion,
+  Card,
 } from '@/utils/imageCache.utils';
 
 const CARDS_API_URL =
@@ -37,10 +37,12 @@ interface ImageCacheContextType {
   imageCache: ImageCache;
   isLoading: boolean;
   loadingProgress: LoadingProgress;
-  loadingMessage: string; // <-- nuevo
+  loadingMessage: string;
   getImage: (remoteUrl: string) => SkImage | null;
   clearCache: () => Promise<void>;
   cacheSize: number;
+  expansions: Expansion[];
+  cardPool: Card[];
 }
 
 const ImageCacheContext = createContext<ImageCacheContextType | undefined>(
@@ -57,6 +59,8 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
     totalBatches: 0,
   });
   const [loadingMessage, setLoadingMessage] = useState('Booting up...');
+  const [expansions, setExpansions] = useState<Expansion[]>([]);
+  const [cardPool, setCardPool] = useState<Card[]>([]);
 
   const buildSkiaCache = useCallback(
     async (imagesMap: Record<string, string>) => {
@@ -64,7 +68,7 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
 
       for (const [remoteUrl, localPath] of Object.entries(imagesMap)) {
         try {
-          const data = await Skia.Data.fromURI(localPath); // <- aquí el await
+          const data = await Skia.Data.fromURI(localPath);
           if (!data) {
             newCache[remoteUrl] = null;
             continue;
@@ -92,6 +96,12 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
 
         const res = await fetch(CARDS_API_URL);
         const newExpansions: Expansion[] = await res.json();
+
+        // Guardar expansiones y cardPool para otros contextos
+        if (mounted) {
+          setExpansions(newExpansions);
+          setCardPool(newExpansions.flatMap((exp) => exp.cards));
+        }
 
         if (!oldExpansions) {
           setLoadingMessage('Gathering all creatures and relics...');
@@ -186,7 +196,9 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCache = useCallback(async () => {
     setImageCache({});
-    await saveCachedData([], {}); // limpia AsyncStorage
+    await saveCachedData([], {});
+    setExpansions([]);
+    setCardPool([]);
   }, []);
 
   const cacheSize = useMemo(() => Object.keys(imageCache).length, [imageCache]);
@@ -196,12 +208,24 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
       imageCache,
       isLoading,
       loadingProgress,
-      getImage,
       loadingMessage,
+      getImage,
       clearCache,
       cacheSize,
+      expansions,
+      cardPool,
     }),
-    [imageCache, isLoading, loadingProgress, getImage, clearCache, cacheSize]
+    [
+      imageCache,
+      isLoading,
+      loadingProgress,
+      loadingMessage,
+      getImage,
+      clearCache,
+      cacheSize,
+      expansions,
+      cardPool,
+    ]
   );
 
   return (

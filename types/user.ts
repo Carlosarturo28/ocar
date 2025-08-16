@@ -1,30 +1,10 @@
 // types/user.ts
 
+import { Card, Expansion } from '@/utils/imageCache.utils';
+
 // Tipos literales para mayor seguridad y autocompletado
 export type CardType = 'Object' | 'Realm' | 'Creature' | 'Servants';
 export type CardAffinity = 'Umbral' | 'Verdant' | 'Bestial' | 'Arcane';
-
-// Estructura de una carta, incluyendo la probabilidad
-export interface Card {
-  id: string;
-  name: string;
-  imageUrl: string;
-  foilUrl: string;
-  isHolo: boolean;
-  maskUrl: string;
-  type: CardType;
-  affinity: CardAffinity;
-  probability: number;
-}
-
-export interface Expansion {
-  id: number;
-  name: string;
-  description: string;
-  releaseYear: number;
-  logoUrl?: string;
-  cards: Card[];
-}
 
 // Estructura del usuario, con los nuevos campos para el límite de sobres
 export interface User {

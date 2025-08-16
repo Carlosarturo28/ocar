@@ -133,10 +133,24 @@ const CustomTabBar: React.FC<
 
   return (
     <View
-      style={[styles.customTabBarContainer, { paddingBottom: insets.bottom }]}
+      style={[
+        styles.customTabBarContainer,
+        { height: insets.bottom > 30 ? 140 : 100 + insets.bottom },
+      ]}
     >
-      <ImageBackground source={BACKGROUND_IMAGE} style={styles.tabBarBg}>
-        <View style={styles.tabBarContent}>
+      <ImageBackground
+        source={BACKGROUND_IMAGE}
+        style={[
+          styles.tabBarBg,
+          { height: insets.bottom > 30 ? 140 : 100 + insets.bottom },
+        ]}
+      >
+        <View
+          style={[
+            styles.tabBarContent,
+            { marginBottom: insets.bottom > 30 ? 30 : 0 },
+          ]}
+        >
           {state.routes.map((route, index) => {
             const isFocused = state.index === index;
             const tabInfo = tabConfig[route.name as keyof typeof tabConfig];
@@ -211,12 +225,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 110,
     backgroundColor: 'transparent',
   },
   tabBarBg: {
     flex: 1,
-    height: 110,
   },
   tabBarContent: {
     flex: 1,

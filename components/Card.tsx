@@ -1,6 +1,6 @@
-// components/Card.tsx
+// components/Card.tsx - VERSIÓN OPTIMIZADA MANTENIENDO TUS FEATURES
 
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { useWindowDimensions, StyleSheet, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -15,20 +15,20 @@ import { ImageCanvas } from './card/ImageCanvas';
 
 export interface CardAssets {
   base: string;
-  mask: string;
-  foil: string;
+  mask: string | null;
+  foil: string | null;
 }
 
-// ✅ 1. AÑADIMOS PROPS OPCIONALES PARA EL TAMAÑO
 interface CardProps {
   images: CardAssets;
   index: number;
   onPress: () => void;
-  width?: number; // Ancho opcional
-  height?: number; // Alto opcional
+  width?: number;
+  height?: number;
 }
 
-export function Card({
+// ✅ Memoizar el componente para evitar re-renders innecesarios
+export const Card = memo(function Card({
   images,
   onPress,
   index,
@@ -45,41 +45,34 @@ export function Card({
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      mountProgress.value = withTiming(1, { duration: 700 });
+      mountProgress.value = withDelay(
+        index * 50,
+        withTiming(1, { duration: 500 })
+      );
     });
-  }, []);
+  }, [index]);
 
   const animatedContainerStyle = useAnimatedStyle(() => {
-    const rotateY = interpolate(mountProgress.value, [0, 1], [-90, 0]); // flip
-    const opacity = mountProgress.value; // fade suave
-    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]); // escala
+    const rotateY = interpolate(mountProgress.value, [0, 1], [-90, 0]);
+    const opacity = mountProgress.value;
+    const scale = interpolate(mountProgress.value, [0, 1], [0.95, 1]);
 
     return {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       opacity,
       transform: [
-        { perspective: 1000 }, // para que el flip se vea 3D
+        { perspective: 1000 },
         { rotateY: `${rotateY}deg` },
         { scale },
       ],
     };
   });
 
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      mountProgress.value = withDelay(
-        index * 50,
-        withTiming(1, { duration: 500 })
-      );
-    });
-  }, []);
-
   const animatedWidth = useSharedValue(CARD_WIDTH);
   const animatedHeight = useSharedValue(CARD_HEIGHT);
   const animatedRadius = useSharedValue(CARD_RADIUS);
 
-  // El resto de la lógica de inclinación no cambia para nada...
   const [gradientCenter, setGradientCenter] = React.useState({ x: 0, y: 0 });
   const handleRotationChange = React.useCallback(
     (rx: number, ry: number) => {
@@ -92,6 +85,7 @@ export function Card({
     },
     [CARD_WIDTH, CARD_HEIGHT]
   );
+
   const touchPosition = useSharedValue({ x: -1, y: -1 });
   const handleTouch = React.useCallback((x: number, y: number) => {
     'worklet';
@@ -124,7 +118,7 @@ export function Card({
       </Animated.View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardWrapper: {

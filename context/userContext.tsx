@@ -1,5 +1,3 @@
-// context/UserContext.tsx
-
 import React, {
   createContext,
   useState,
@@ -7,9 +5,11 @@ import React, {
   ReactNode,
   useContext,
 } from 'react';
-import { Alert } from 'react-native'; // Alert se mantiene por si se usa en otras funciones como resetAccount
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, Card, UserContextType, Expansion } from '../types/user';
+import { User, UserContextType } from '../types/user';
+import { useImageCache } from './ImageCacheContext';
+import { Card } from '@/utils/imageCache.utils';
 
 export const UserContext = createContext<UserContextType | undefined>(
   undefined
@@ -21,9 +21,14 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [expansions, setExpansions] = useState<Expansion[]>([]);
-  const [cardPool, setCardPool] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Usar datos y loading desde ImageCacheContext
+  const {
+    isLoading: imagesCacheLoading,
+    expansions,
+    cardPool,
+  } = useImageCache();
 
   const createNewUser = (): User => ({
     username: 'Nuevo Jugador',
@@ -34,41 +39,26 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   useEffect(() => {
     const loadInitialData = async () => {
+      if (imagesCacheLoading) return;
+
       try {
-        const userLoader = async () => {
-          const userDataJSON = await AsyncStorage.getItem('user');
-          if (userDataJSON) {
-            setUser(JSON.parse(userDataJSON) as User);
-          } else {
-            const newUser = createNewUser();
-            await AsyncStorage.setItem('user', JSON.stringify(newUser));
-            setUser(newUser);
-          }
-        };
-        const cardLoader = async () => {
-          const response = await fetch(
-            'https://raw.githubusercontent.com/Carlosarturo28/ocar/refs/heads/main/assets/cards.json'
-          );
-          if (!response.ok) throw new Error('Failed to fetch card data');
-
-          const expansionsData = (await response.json()) as Expansion[];
-          setExpansions(expansionsData);
-
-          const allCards = expansionsData.flatMap(
-            (expansion) => expansion.cards
-          );
-          setCardPool(allCards);
-        };
-
-        await Promise.all([userLoader(), cardLoader()]);
+        const userDataJSON = await AsyncStorage.getItem('user');
+        if (userDataJSON) {
+          setUser(JSON.parse(userDataJSON) as User);
+        } else {
+          const newUser = createNewUser();
+          await AsyncStorage.setItem('user', JSON.stringify(newUser));
+          setUser(newUser);
+        }
       } catch (error) {
         console.error('Error al cargar los datos iniciales:', error);
       } finally {
         setIsLoading(false);
       }
     };
+
     loadInitialData();
-  }, []);
+  }, [imagesCacheLoading]);
 
   const addCardsFromBooster = async (drawnCards: Card[]) => {
     if (!user) return;
@@ -80,15 +70,12 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const today = new Date().toISOString().split('T')[0];
     let packsOpened = user.lastOpenedDate === today ? user.packsOpenedToday : 0;
 
-    if (!isDebugUser) {
-      if (packsOpened >= 2) {
-        // La alerta de límite se queda, porque es un feedback importante.
-        Alert.alert(
-          'Límite Alcanzado',
-          'Ya has abierto tus 2 sobres de hoy. ¡Vuelve mañana!'
-        );
-        return;
-      }
+    if (!isDebugUser && packsOpened >= 2) {
+      Alert.alert(
+        'Límite Alcanzado',
+        'Ya has abierto tus 2 sobres de hoy. ¡Vuelve mañana!'
+      );
+      return;
     }
 
     try {
@@ -96,16 +83,16 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       const newUniqueCards = drawnCards.filter(
         (card) => !acquiredCardIds.has(card.id)
       );
+
       const updatedUser: User = {
         ...user,
         acquiredCards: [...user.acquiredCards, ...newUniqueCards],
         lastOpenedDate: today,
         packsOpenedToday: packsOpened + 1,
       };
+
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
-
-      // ✅ ¡LISTO! LA ALERTA DE "OBTUVISTE ESTAS CARTAS" HA SIDO ELIMINADA.
     } catch (error) {
       console.error('Error al agregar las cartas del sobre:', error);
     }
@@ -135,13 +122,15 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
   };
 
+  const totalLoading = isLoading || imagesCacheLoading;
+
   return (
     <UserContext.Provider
       value={{
         user,
         expansions,
         cardPool,
-        isLoading,
+        isLoading: totalLoading,
         updateUsername,
         addCardsFromBooster,
         resetAccount,

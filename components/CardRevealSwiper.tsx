@@ -11,7 +11,7 @@ import {
   Easing,
 } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
-import { Card as CardData } from '../types/user';
+import { Card as CardData } from '@/utils/imageCache.utils';
 
 export interface RevealedCard {
   card: CardData;

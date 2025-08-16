@@ -44,8 +44,8 @@ export function ImageCanvas({
   const { getImage } = useImageCache();
 
   const baseImage: SkImage | null = getImage(images.base);
-  const maskImage: SkImage | null = getImage(images.mask);
-  const foilImage: SkImage | null = getImage(images.foil);
+  const maskImage: SkImage | null = getImage(images.mask ?? '');
+  const foilImage: SkImage | null = getImage(images.foil ?? '');
 
   const isFoilVisible = useDerivedValue(() => {
     return touchPosition.value.x > 0;

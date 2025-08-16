@@ -2,7 +2,7 @@
 
 import { RevealedCard, CardRevealSwiper } from '@/components/CardRevealSwiper';
 import { useUser } from '@/context/userContext';
-import { Card } from '@/types/user';
+import { Card } from '@/utils/imageCache.utils';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,

@@ -1,10 +1,7 @@
-// screens/CardListScreen.tsx
-
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
   View,
   SectionList,
-  FlatList,
   StyleSheet,
   Text,
   StatusBar,
@@ -23,16 +20,31 @@ import { Card as CardComponent } from '@/components/Card';
 import { AnimatedSelectedCard } from '@/components/card/AnimatedSelectedCard';
 import { ExpansionDetailSheet } from '@/components/ExpansionDetailSheet';
 import { useUser } from '@/context/userContext';
-import { Expansion } from '@/types/user';
+import { useImageCache } from '@/context/ImageCacheContext';
+import { Expansion } from '@/utils/imageCache.utils';
 
 // --- Local Resources ---
 const CARD_BACK_IMAGE = require('@/assets/images/back.webp');
 const LOGO_IMAGE = require('@/assets/logo.png');
 const INFO_ICON_IMAGE = require('@/assets/images/info-icon.png');
 
+interface CardRow {
+  id: string;
+  cards: any[];
+}
+
+interface ExpansionSection extends Expansion {
+  data: CardRow[];
+}
+
 export default function CardListScreen() {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const { user, isLoading, expansions } = useUser();
+  const {
+    isLoading: imagesLoading,
+    loadingMessage,
+    loadingProgress,
+  } = useImageCache();
 
   const [selectedExpansion, setSelectedExpansion] = useState<Expansion | null>(
     null
@@ -49,17 +61,30 @@ export default function CardListScreen() {
     [expansions]
   );
 
-  const sections = useMemo(
-    () =>
-      expansions.map((exp) => ({
+  // Convertir expansiones a secciones con filas de 3 cartas
+  const sections = useMemo((): ExpansionSection[] => {
+    return expansions.map((exp) => {
+      const cards = exp.cards || [];
+      const rows: CardRow[] = [];
+
+      for (let i = 0; i < cards.length; i += 3) {
+        const rowCards = cards.slice(i, i + 3);
+        rows.push({
+          id: `${exp.id}-row-${i}`,
+          cards: rowCards,
+        });
+      }
+
+      return {
         ...exp,
-        data: [exp.cards || []],
-      })),
-    [expansions]
-  );
+        data: rows,
+      };
+    });
+  }, [expansions]);
 
   const CARD_WIDTH = SCREEN_WIDTH / 3.6;
   const CARD_HEIGHT = 170;
+  const ROW_HEIGHT = CARD_HEIGHT + 16;
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cardPositions, setCardPositions] = useState<{
@@ -73,19 +98,40 @@ export default function CardListScreen() {
 
   const selectedItem = cardPool.find((c) => c.id === selectedId);
 
-  const handleCardLayout = (cardId: string, event: LayoutChangeEvent) => {
-    event.target.measureInWindow((x, y, width, height) => {
-      setCardPositions((prev) => ({
-        ...prev,
-        [cardId]: { x: x + width / 2, y: y + height / 2 },
-      }));
-    });
-  };
+  const handleCardLayout = useCallback(
+    (cardId: string, event: LayoutChangeEvent) => {
+      event.target.measureInWindow((x, y, width, height) => {
+        setCardPositions((prev) => ({
+          ...prev,
+          [cardId]: { x: x + width / 2, y: y + height / 2 },
+        }));
+      });
+    },
+    []
+  );
 
-  if (isLoading) {
+  // ✅ Loading mejorado con progreso de imágenes
+  if (isLoading || imagesLoading) {
+    const progressPercentage =
+      loadingProgress.total > 0
+        ? Math.round((loadingProgress.loaded / loadingProgress.total) * 100)
+        : 0;
+
     return (
       <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size='large' color='#fff' />
+        <Image source={LOGO_IMAGE} style={styles.loadingLogo} />
+        <ActivityIndicator
+          size='large'
+          color='#c7a568'
+          style={styles.loadingSpinner}
+        />
+        <Text style={styles.loadingMessage}>{loadingMessage}</Text>
+        {loadingProgress.total > 0 && (
+          <Text style={styles.loadingProgress}>
+            {loadingProgress.loaded} / {loadingProgress.total} (
+            {progressPercentage}%)
+          </Text>
+        )}
       </View>
     );
   }
@@ -105,12 +151,19 @@ export default function CardListScreen() {
       <StatusBar barStyle='light-content' />
       <SectionList
         sections={sections}
-        keyExtractor={(item, index) =>
-          item[0]?.id
-            ? `section-${item[0].id}-${index}`
-            : `section-empty-${index}`
-        }
+        keyExtractor={(item) => item.id}
         stickySectionHeadersEnabled={false}
+        removeClippedSubviews={true}
+        // ✅ Optimizaciones compensatorias para mantener performance
+        maxToRenderPerBatch={29}
+        initialNumToRender={20}
+        windowSize={20}
+        legacyImplementation={false}
+        getItemLayout={(data, index) => ({
+          length: ROW_HEIGHT,
+          offset: ROW_HEIGHT * index,
+          index,
+        })}
         ListHeaderComponent={
           <View style={styles.logoContainer}>
             <Image source={LOGO_IMAGE} style={styles.logo} />
@@ -155,13 +208,13 @@ export default function CardListScreen() {
             )}
           </View>
         )}
-        renderItem={({ item }) => (
-          <FlatList
-            data={item}
-            renderItem={({ item: cardItem, index }) => {
+        renderItem={({ item: row }) => (
+          <View style={styles.cardRow}>
+            {row.cards.map((cardItem, index) => {
               const isAcquired = acquiredCardIds.has(cardItem.id);
               return (
                 <View
+                  key={cardItem.id}
                   style={styles.gridItemContainer}
                   onLayout={(e) => handleCardLayout(cardItem.id, e)}
                 >
@@ -177,11 +230,13 @@ export default function CardListScreen() {
                     />
                   ) : (
                     <View
-                      style={{
-                        width: CARD_WIDTH,
-                        height: CARD_HEIGHT,
-                        margin: 8,
-                      }}
+                      style={[
+                        styles.cardBackContainer,
+                        {
+                          width: CARD_WIDTH,
+                          height: CARD_HEIGHT,
+                        },
+                      ]}
                     >
                       <Image
                         source={CARD_BACK_IMAGE}
@@ -191,11 +246,12 @@ export default function CardListScreen() {
                   )}
                 </View>
               );
-            }}
-            keyExtractor={(cardItem) => cardItem.id}
-            numColumns={3}
-            scrollEnabled={false}
-          />
+            })}
+            {/* Spacers para completar filas incompletas */}
+            {Array.from({ length: 3 - row.cards.length }).map((_, index) => (
+              <View key={`spacer-${index}`} style={styles.gridItemContainer} />
+            ))}
+          </View>
         )}
       />
 
@@ -223,6 +279,30 @@ export default function CardListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#121212' },
   centered: { justifyContent: 'center', alignItems: 'center' },
+
+  // ✅ Estilos mejorados para loading
+  loadingLogo: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+    marginBottom: 20,
+  },
+  loadingSpinner: {
+    marginBottom: 20,
+  },
+  loadingMessage: {
+    color: '#c7a568',
+    fontSize: 16,
+    textAlign: 'center',
+    fontFamily: 'Cinzel_400Regular',
+    marginBottom: 10,
+  },
+  loadingProgress: {
+    color: '#646464',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
   errorText: {
     color: '#ff6b6b',
     fontSize: 16,
@@ -231,10 +311,6 @@ const styles = StyleSheet.create({
   },
   logoContainer: { alignItems: 'center', marginTop: 40 },
   logo: { width: 150, height: 150, resizeMode: 'contain' },
-  sectionHeaderWrapper: {
-    marginTop: 40,
-    marginBottom: 20,
-  },
   sectionHeaderContainer: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -261,10 +337,25 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
   },
+
+  // ✅ Nuevos estilos para el grid de cartas
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
   gridItemContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardBackContainer: {
+    margin: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
   },
   cardBackImage: {
     width: '100%',
