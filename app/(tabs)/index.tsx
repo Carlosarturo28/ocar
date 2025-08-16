@@ -11,6 +11,7 @@ import {
   LayoutChangeEvent,
   useWindowDimensions,
   Pressable,
+  Alert
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -220,8 +221,11 @@ maxToRenderPerBatch={50}
                           width: CARD_WIDTH,
                           height: CARD_HEIGHT,
                         },
-                      ]} onPress={() => setSelectedId(cardItem.id)}>
-                    <Image source={cardItem.imageUrl} styles={styles.cardBackImage} />
+                      ]} onPress={() => {
+                      setSelectedId(cardItem.id)
+                    Alert.alert(cardItem.imageUrl)
+                    }}>
+                    <Image source={{ uri: cardItem.imageUrl }} styles={styles.cardBackImage} />
                     </Pressable>
                   ) : (
                     <View
