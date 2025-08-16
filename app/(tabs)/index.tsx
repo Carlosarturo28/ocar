@@ -225,7 +225,7 @@ maxToRenderPerBatch={50}
                       setSelectedId(cardItem.id)
                     Alert.alert(cardItem.imageUrl)
                     }}>
-                    <Image source={{ uri: cardItem.imageUrl }} styles={styles.cardBackImage} />
+                    <Image source={{ uri: cardItem.imageUrl }} style={styles.cardBackImage} />
                     </Pressable>
                   ) : (
                     <View
