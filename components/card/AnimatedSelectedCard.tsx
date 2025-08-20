@@ -6,7 +6,6 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import { CardAssets } from '../Card';
 import { GestureContainer } from '../card/GestureContainer';
 import { ImageCanvas } from '../card/ImageCanvas';
 import Animated, {
@@ -23,6 +22,12 @@ interface Props {
   onClose: () => void;
   fromPosition?: { x: number; y: number }; // ✅ Posición de origen para la animación
   isHolo?: boolean;
+}
+
+export interface CardAssets {
+  base: string;
+  mask: string | null;
+  foil: string | null;
 }
 
 export function AnimatedSelectedCard({

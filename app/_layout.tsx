@@ -4,20 +4,15 @@ import {
   Cinzel_700Bold,
   Cinzel_400Regular,
 } from '@expo-google-fonts/cinzel';
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { View, ActivityIndicator, Text, StatusBar } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { ImageCacheProvider, useImageCache } from '@/context/ImageCacheContext';
-import { useColorScheme } from '@/components/useColorScheme';
 import { UserProvider } from '@/context/userContext';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
@@ -67,8 +62,6 @@ function RootLayoutNav() {
 }
 
 function AppContent() {
-  const colorScheme = useColorScheme();
-
   const {
     isLoading: areImagesLoading,
     loadingMessage,
@@ -85,7 +78,7 @@ function AppContent() {
           backgroundColor: '#121212',
         }}
       >
-        <StatusBar barStyle='light-content' />
+        <SystemBars style='dark' />
         <ActivityIndicator size='large' color='#fff' />
         <Text
           style={{
@@ -105,11 +98,10 @@ function AppContent() {
 
   return (
     <UserProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-        </Stack>
-      </ThemeProvider>
+      <SystemBars style='dark' />
+      <Stack>
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      </Stack>
     </UserProvider>
   );
 }
