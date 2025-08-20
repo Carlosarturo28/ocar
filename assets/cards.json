@@ -560,6 +560,44 @@
         "flavorText": "Its call sends a shiver through the wilds. To hear it is to feel your strength abandon you.",
         "auxiliaryText": "When the howl rises, the wild answers.",
         "passive": "Primal Resonance - Roll a d6 — Draw that much mana from your opponent. If you roll a perfect, also deal 3 damage to the target."
+      },
+       {
+        "id": "26",
+        "name": "Leechbloom Sprout",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755665247/26_-_Leechbloom_Sprout_qglm7m.webp",
+        "foilUrl": null,
+        "isHolo": true,
+        "maskUrl": null,
+        "type": "Object",
+        "affinity": "Verdant",
+        "probability": 0.2,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "Through the Verdant way, every spark of power is reborn, not wasted, but woven into living veins.",
+        "auxiliaryText": "Its visions can twist the path of destiny.",
+        "passive": "Blooming Vitality - Harvest your mana. Spend all of your mana to restore that much life. You cannot exceed your creature’s maximum health."
+      },
+             {
+        "id": "27",
+        "name": "Scroll of Bound Souls",
+        "imageUrl": "https://res.cloudinary.com/ofcreaturesandrealms/image/upload/v1755665245/27_-_Scroll_of_Bound_Souls_zwbojq.webp",
+        "foilUrl": null,
+        "isHolo": true,
+        "maskUrl": null,
+        "type": "Object",
+        "affinity": "Arcane",
+        "probability": 0.5,
+        "realmCost": null,
+        "manaCost": null,
+        "manaBonus": null,
+        "hp": null,
+        "artist": "AndrewPr0",
+        "flavorText": "The scroll shakes with the cries of lost souls. Deny them, and your realm will burn with their wrath.",
+        "auxiliaryText": "It screams, from time to time.",
+        "passive": "Whispers of Sacrifice - Your opponent chooses if sacrifice 2 cards to the scroll, or their realm suffers 3 damage."
       }
     ]
   }
