@@ -79,20 +79,45 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
 
     try {
-      const acquiredCardIds = new Set(user.acquiredCards.map((c) => c.id));
-      const newUniqueCards = drawnCards.filter(
-        (card) => !acquiredCardIds.has(card.id)
+      // Crear un Set con los IDs de cartas ya adquiridas (convertir a string para consistencia)
+      const acquiredCardIds = new Set(
+        user.acquiredCards.map((c) => String(c.id))
       );
 
-      const updatedUser: User = {
-        ...user,
-        acquiredCards: [...user.acquiredCards, ...newUniqueCards],
-        lastOpenedDate: today,
-        packsOpenedToday: packsOpened + 1,
-      };
+      // Filtrar cartas duplicadas dentro del mismo booster Y cartas ya adquiridas
+      const uniqueDrawnCards = drawnCards.filter((card, index, arr) => {
+        const cardId = String(card.id);
+        // Verificar si es la primera ocurrencia de esta carta en el booster
+        const isFirstOccurrence =
+          arr.findIndex((c) => String(c.id) === cardId) === index;
+        // Verificar si ya la tenemos en nuestra colección
+        const notAlreadyOwned = !acquiredCardIds.has(cardId);
 
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+        return isFirstOccurrence && notAlreadyOwned;
+      });
+
+      // Solo agregar cartas realmente nuevas
+      if (uniqueDrawnCards.length > 0) {
+        const updatedUser: User = {
+          ...user,
+          acquiredCards: [...user.acquiredCards, ...uniqueDrawnCards],
+          lastOpenedDate: today,
+          packsOpenedToday: packsOpened + 1,
+        };
+
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      } else {
+        // Aunque no agregamos cartas nuevas, incrementamos el contador de sobres
+        const updatedUser: User = {
+          ...user,
+          lastOpenedDate: today,
+          packsOpenedToday: packsOpened + 1,
+        };
+
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      }
     } catch (error) {
       console.error('Error al agregar las cartas del sobre:', error);
     }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Canvas,
   RadialGradient,
@@ -8,9 +8,9 @@ import {
   RoundedRect,
   Mask,
   SkPoint,
-  SkImage, // Importamos el tipo SkImage para type-safety
+  SkImage,
+  Skia,
 } from '@shopify/react-native-skia';
-import { CardAssets } from '../Card';
 import { HolographicLayer } from './HolographicLayer';
 import Animated, {
   SharedValue,
@@ -18,7 +18,7 @@ import Animated, {
   useDerivedValue,
   DerivedValue,
 } from 'react-native-reanimated';
-import { useImageCache } from '@/context/ImageCacheContext';
+import { CardAssets } from './AnimatedSelectedCard';
 
 interface ImageCanvasProps {
   width: SharedValue<number>;
@@ -41,11 +41,47 @@ export function ImageCanvas({
   isSelected,
   isHolo = false,
 }: ImageCanvasProps) {
-  const { getImage } = useImageCache();
+  const [baseImage, setBaseImage] = useState<SkImage | null>(null);
+  const [maskImage, setMaskImage] = useState<SkImage | null>(null);
+  const [foilImage, setFoilImage] = useState<SkImage | null>(null);
 
-  const baseImage: SkImage | null = getImage(images.base);
-  const maskImage: SkImage | null = getImage(images.mask ?? '');
-  const foilImage: SkImage | null = getImage(images.foil ?? '');
+  // ✅ Cargar imágenes desde rutas locales
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        // Cargar imagen base
+        if (images.base) {
+          const baseData = await Skia.Data.fromURI(images.base);
+          if (baseData) {
+            const baseImg = Skia.Image.MakeImageFromEncoded(baseData);
+            setBaseImage(baseImg);
+          }
+        }
+
+        // Cargar imagen de máscara si existe
+        if (images.mask) {
+          const maskData = await Skia.Data.fromURI(images.mask);
+          if (maskData) {
+            const maskImg = Skia.Image.MakeImageFromEncoded(maskData);
+            setMaskImage(maskImg);
+          }
+        }
+
+        // Cargar imagen de foil si existe
+        if (images.foil) {
+          const foilData = await Skia.Data.fromURI(images.foil);
+          if (foilData) {
+            const foilImg = Skia.Image.MakeImageFromEncoded(foilData);
+            setFoilImage(foilImg);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading images for Canvas:', error);
+      }
+    };
+
+    loadImages();
+  }, [images.base, images.mask, images.foil]);
 
   const isFoilVisible = useDerivedValue(() => {
     return touchPosition.value.x > 0;
@@ -70,8 +106,13 @@ export function ImageCanvas({
     };
   });
 
+  // ✅ Mostrar loading o fallback mientras cargan las imágenes
   if (!baseImage) {
-    return null;
+    return (
+      <Animated.View style={[animatedCanvasStyle, { backgroundColor: '#333' }]}>
+        {/* Placeholder mientras carga la imagen */}
+      </Animated.View>
+    );
   }
 
   function glareShinyLayer() {

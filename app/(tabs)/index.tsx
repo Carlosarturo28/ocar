@@ -11,12 +11,12 @@ import {
   LayoutChangeEvent,
   useWindowDimensions,
   Pressable,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 // --- UI Components & Context ---
-import { Card as CardComponent } from '@/components/Card';
 import { AnimatedSelectedCard } from '@/components/card/AnimatedSelectedCard';
 import { ExpansionDetailSheet } from '@/components/ExpansionDetailSheet';
 import { useUser } from '@/context/userContext';
@@ -155,15 +155,10 @@ export default function CardListScreen() {
         stickySectionHeadersEnabled={false}
         removeClippedSubviews={true}
         // ✅ Optimizaciones compensatorias para mantener performance
-        maxToRenderPerBatch={29}
-        initialNumToRender={20}
-        windowSize={20}
+        initialNumToRender={50}
+        windowSize={50}
+        maxToRenderPerBatch={50}
         legacyImplementation={false}
-        getItemLayout={(data, index) => ({
-          length: ROW_HEIGHT,
-          offset: ROW_HEIGHT * index,
-          index,
-        })}
         ListHeaderComponent={
           <View style={styles.logoContainer}>
             <Image source={LOGO_IMAGE} style={styles.logo} />
@@ -190,6 +185,7 @@ export default function CardListScreen() {
             />
             {section.logoUrl && (
               <>
+                {/* ✅ Directo: section.logoUrl ya contiene la ruta local */}
                 <Image
                   source={{ uri: section.logoUrl }}
                   style={styles.sectionHeaderLogo}
@@ -219,15 +215,22 @@ export default function CardListScreen() {
                   onLayout={(e) => handleCardLayout(cardItem.id, e)}
                 >
                   {isAcquired ? (
-                    <CardComponent
-                      index={index}
-                      images={{
-                        base: cardItem.imageUrl,
-                        mask: cardItem.maskUrl,
-                        foil: cardItem.foilUrl,
-                      }}
+                    <Pressable
+                      style={[
+                        styles.cardBackContainer,
+                        {
+                          width: CARD_WIDTH,
+                          height: CARD_HEIGHT,
+                        },
+                      ]}
                       onPress={() => setSelectedId(cardItem.id)}
-                    />
+                    >
+                      {/* ✅ Súper simple: cardItem.imageUrl ya es la ruta local */}
+                      <Image
+                        source={{ uri: cardItem.imageUrl }}
+                        style={styles.cardBackImage}
+                      />
+                    </Pressable>
                   ) : (
                     <View
                       style={[

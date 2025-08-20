@@ -40,7 +40,7 @@ export default function ProfileScreen() {
       totalHolo: user.acquiredCards.filter((c) => c.isHolo).length,
     };
     return user.acquiredCards.reduce((acc, card) => {
-      acc.byAffinity[card.affinity]++;
+      acc.byAffinity[card.affinity as CardAffinity]++;
       return acc;
     }, initialStats);
   }, [user]);

@@ -41,8 +41,8 @@ interface ImageCacheContextType {
   getImage: (remoteUrl: string) => SkImage | null;
   clearCache: () => Promise<void>;
   cacheSize: number;
-  expansions: Expansion[];
-  cardPool: Card[];
+  expansions: Expansion[]; // ✅ Estas expansions ya tienen rutas locales
+  cardPool: Card[]; // ✅ Estas cards ya tienen rutas locales
 }
 
 const ImageCacheContext = createContext<ImageCacheContextType | undefined>(
@@ -61,6 +61,30 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
   const [loadingMessage, setLoadingMessage] = useState('Booting up...');
   const [expansions, setExpansions] = useState<Expansion[]>([]);
   const [cardPool, setCardPool] = useState<Card[]>([]);
+
+  // ✅ Función para convertir URLs remotas a rutas locales en las expansiones
+  const convertExpansionsToLocalPaths = useCallback(
+    (
+      expansions: Expansion[],
+      imagesMap: Record<string, string>
+    ): Expansion[] => {
+      return expansions.map((expansion) => ({
+        ...expansion,
+        logoUrl: imagesMap[expansion.logoUrl] || expansion.logoUrl, // Convertir logo
+        cards: expansion.cards.map((card) => ({
+          ...card,
+          imageUrl: imagesMap[card.imageUrl] || card.imageUrl, // Convertir imagen de carta
+          maskUrl: card.maskUrl
+            ? imagesMap[card.maskUrl] || card.maskUrl
+            : card.maskUrl, // Convertir máscara solo si no es null
+          foilUrl: card.foilUrl
+            ? imagesMap[card.foilUrl] || card.foilUrl
+            : card.foilUrl, // Convertir foil solo si no es null
+        })),
+      }));
+    },
+    []
+  );
 
   const buildSkiaCache = useCallback(
     async (imagesMap: Record<string, string>) => {
@@ -95,17 +119,11 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
           await loadCachedData();
 
         const res = await fetch(CARDS_API_URL);
-        const newExpansions: Expansion[] = await res.json();
-
-        // Guardar expansiones y cardPool para otros contextos
-        if (mounted) {
-          setExpansions(newExpansions);
-          setCardPool(newExpansions.flatMap((exp) => exp.cards));
-        }
+        const remoteExpansions: Expansion[] = await res.json();
 
         if (!oldExpansions) {
           setLoadingMessage('Gathering all creatures and relics...');
-          const urls = extractAllUrls(newExpansions);
+          const urls = extractAllUrls(remoteExpansions);
 
           setLoadingProgress({
             loaded: 0,
@@ -125,15 +143,23 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
           }
 
           setLoadingMessage('Sealing the archives in the Royal Library...');
-          await saveCachedData(newExpansions, newMap);
+          await saveCachedData(remoteExpansions, newMap);
 
           if (mounted) {
+            // ✅ Convertir expansiones a rutas locales ANTES de guardarlas en el estado
+            const localExpansions = convertExpansionsToLocalPaths(
+              remoteExpansions,
+              newMap
+            );
+            setExpansions(localExpansions);
+            setCardPool(localExpansions.flatMap((exp) => exp.cards));
+
             setLoadingMessage('Imbuing magic into the scrolls...');
             await buildSkiaCache(newMap);
           }
         } else {
           const { added, removed } = compareExpansions(
-            newExpansions,
+            remoteExpansions,
             oldExpansions
           );
           const updatedMap = { ...oldMap };
@@ -169,9 +195,17 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
           }
 
           setLoadingMessage('Sealing the archives in the Royal Library...');
-          await saveCachedData(newExpansions, updatedMap);
+          await saveCachedData(remoteExpansions, updatedMap);
 
           if (mounted) {
+            // ✅ Convertir expansiones a rutas locales ANTES de guardarlas en el estado
+            const localExpansions = convertExpansionsToLocalPaths(
+              remoteExpansions,
+              updatedMap
+            );
+            setExpansions(localExpansions);
+            setCardPool(localExpansions.flatMap((exp) => exp.cards));
+
             setLoadingMessage('Imbuing magic into the scrolls...');
             await buildSkiaCache(updatedMap);
           }
@@ -187,7 +221,7 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       mounted = false;
     };
-  }, [buildSkiaCache]);
+  }, [buildSkiaCache, convertExpansionsToLocalPaths]);
 
   const getImage = useCallback(
     (remoteUrl: string) => imageCache[remoteUrl] || null,
@@ -212,8 +246,8 @@ export const ImageCacheProvider = ({ children }: { children: ReactNode }) => {
       getImage,
       clearCache,
       cacheSize,
-      expansions,
-      cardPool,
+      expansions, // ✅ Ya contienen rutas locales
+      cardPool, // ✅ Ya contienen rutas locales
     }),
     [
       imageCache,
